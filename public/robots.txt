@@ -1,8 +1,8 @@
-# Acorn Pals - Robots.txt
-# LAUNCHED: Allowing all crawlers
+# Robots.txt
+# Allowing all crawlers
 
 User-agent: *
 Allow: /
 
-# Sitemap location
-Sitemap: https://www.acornpals.com/sitemap-index.xml
+# Sitemap location (update with your domain)
+# Sitemap: https://www.example.com/sitemap-index.xml

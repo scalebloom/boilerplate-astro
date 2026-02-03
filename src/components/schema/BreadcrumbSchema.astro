@@ -13,20 +13,20 @@ interface Props {
 
 const { currentPath } = Astro.props;
 
-// Map of paths to page names
+// Map of paths to page names (add custom overrides here)
 const pageNames: Record<string, string> = {
   "/": "Home",
-  "/about": "About",
-  "/contact": "Contact",
-  "/brand-kit": "Brand Kit",
-  "/jobs": "Jobs",
 };
 
-// Get the current page name, fallback to formatted path
+// Get the current page name, fallback to formatted path with title case
 const getCurrentPageName = (path: string): string => {
-  // Remove trailing slash if present (except for home)
   const normalizedPath = path === "/" ? path : path.replace(/\/$/, "");
-  return pageNames[normalizedPath] || normalizedPath.slice(1).replace(/-/g, " ");
+  if (pageNames[normalizedPath]) return pageNames[normalizedPath];
+  // Convert path to title case: /my-page -> My Page
+  return normalizedPath
+    .slice(1)
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 };
 
 // Build breadcrumb items

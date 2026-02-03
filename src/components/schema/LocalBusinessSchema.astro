@@ -57,17 +57,13 @@ const schema = {
   category: siteConfig.business.category,
 
   // Service Type
-  serviceType: [
-    "Kids Party Equipment Rental",
-    "Soft Play Rental",
-    "Party Equipment Delivery",
-  ],
+  serviceType: siteConfig.business.serviceTypes,
 
   // Payment Methods
-  paymentAccepted: ["Cash", "Credit Card", "CashApp"],
+  paymentAccepted: siteConfig.business.paymentAccepted,
 
   // Currencies Accepted
-  currenciesAccepted: "USD",
+  currenciesAccepted: siteConfig.business.currenciesAccepted,
 
   // Social Media Profiles
   sameAs: Object.values(siteConfig.social).filter(Boolean),
