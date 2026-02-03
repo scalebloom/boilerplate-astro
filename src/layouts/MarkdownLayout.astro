@@ -1,0 +1,45 @@
+---
+import Layout from "./Layout.astro";
+import "../styles/h2-waves.css";
+import "../styles/cta-button.css";
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  canonical?: string;
+  includeLocalBusinessSchema?: boolean;
+  maxWidth?: string;
+  frontmatter?: {
+    title: string;
+    description: string;
+    image?: string;
+    canonical?: string;
+    includeLocalBusinessSchema?: boolean;
+    maxWidth?: string;
+  };
+}
+
+const {
+  title,
+  description,
+  image,
+  canonical,
+  includeLocalBusinessSchema,
+  maxWidth = "44rem",
+} = (Astro.props as any).frontmatter || Astro.props;
+---
+
+<Layout
+  title={title}
+  description={description}
+  image={image}
+  canonical={canonical}
+  includeLocalBusinessSchema={includeLocalBusinessSchema}
+>
+  <section style="padding: 1.5rem 1.25rem;">
+    <div style={`max-width: ${maxWidth};margin-inline: auto;text-wrap:pretty`}>
+      <slot />
+    </div>
+  </section>
+</Layout>
