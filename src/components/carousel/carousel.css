@@ -1,0 +1,124 @@
+/* Product Carousel Container */
+.product-carousel {
+  position: relative;
+  width: 100%;
+}
+
+/* Carousel Images Container */
+.carousel-images {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  corner-shape: var(--corner-shape-squircle);
+  border-radius: var(--squircle-m) var(--squircle-m) 0 0;
+}
+
+/* Carousel Image */
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+  display: block;
+  corner-shape: var(--corner-shape-squircle);
+  border-radius: var(--squircle-m) var(--squircle-m) 0 0;
+  cursor: zoom-in;
+}
+
+/* Navigation Buttons */
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, opacity 0.2s ease;
+  padding: 0;
+}
+
+.carousel-nav:hover {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.carousel-nav:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.carousel-nav svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: white;
+  pointer-events: none;
+}
+
+/* Position buttons */
+.carousel-prev {
+  left: 0.75rem;
+}
+
+.carousel-next {
+  right: 0.75rem;
+}
+
+/* Rotate arrow icons */
+.carousel-prev svg {
+  transform: rotate(90deg);
+}
+
+.carousel-next svg {
+  transform: rotate(270deg);
+}
+
+/* Counter */
+.carousel-counter {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: black;
+  background: rgb(256,256,256,.75);
+  padding: 0.25rem 1rem;
+  border-radius: 1.5rem;
+  font-size: .75rem;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+  .carousel-nav {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .carousel-nav svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .carousel-prev {
+    left: 0.5rem;
+  }
+
+  .carousel-next {
+    right: 0.5rem;
+  }
+}
+
+/* Accessibility: respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .carousel-image {
+    transition: none;
+  }
+}

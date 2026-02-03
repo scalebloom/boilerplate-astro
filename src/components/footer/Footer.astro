@@ -1,0 +1,98 @@
+---
+import "./footer.css";
+import Logo from "../logo.astro";
+import { siteConfig } from "../../config/site";
+---
+
+<footer>
+  <div class="footer-inner-container">
+    <h2 class="sr-only">Footer navigation and site information</h2>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <!-- Logo -->
+        <a
+          class="footer-logo-link-wrapper"
+          href="/"
+          rel="home"
+          aria-current="page"
+          aria-label="Home"
+          ><Logo />
+        </a>
+        <!-- Social media links -->
+        <div class="footer-social-media-icon-links">
+          <a
+            href={siteConfig.social.facebook}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visit our Facebook page"
+          >
+            <svg class="footer-social-media-icon"
+              ><use href="/sprite.svg#icon-facebook"></use></svg
+            >
+          </a>
+          <a
+            href={siteConfig.social.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visit our Instagram page"
+          >
+            <svg class="footer-social-media-icon"
+              ><use href="/sprite.svg#icon-instagram"></use></svg
+            >
+          </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h3 id="footer-company-links">Company</h3>
+        <nav aria-labelledby="footer-company-links">
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about/">About Us</a></li>
+            <li><a href="/contact/">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="footer-col">
+        <h3 id="footer-resource-links">Resources</h3>
+        <nav aria-labelledby="footer-resource-links">
+          <ul>
+            <li><a href="/jobs/">Jobs</a></li>
+            <li><a href="/brand-kit/">Brand Kit</a></li>
+            <li>
+              <a href="/soft-play-rental-agreement/"
+                >Soft Play Rental Agreement</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="footer-col">
+        <h3>Contact</h3>
+        <address>
+          <div>
+            <a href={`mailto:${siteConfig.contact.email}`}
+              >{siteConfig.contact.email}</a
+            >
+          </div>
+          <div>
+            Phone: <a href={`tel:${siteConfig.contact.phone}`}
+              >{siteConfig.contact.phoneDisplay}</a
+            >
+          </div>
+          <div>
+            {siteConfig.location.addressLocality}
+            {siteConfig.location.addressRegion}
+          </div>
+        </address>
+      </div>
+    </div>
+    <small class="footnote footer-footnote"
+      >{siteConfig.name} © is a brand owned and operated by
+      <a href="https://www.clearancevault.com/" target="_blank"
+        ><span class="no-break">{siteConfig.legalName}</span></a
+      >
+      | <a class="no-break" href="/privacy-policy/">Privacy Policy</a>
+      | <a href="/accessibility-statement/">Accessibility</a>
+    </small>
+  </div>
+</footer>

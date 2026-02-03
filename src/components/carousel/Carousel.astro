@@ -1,0 +1,249 @@
+---
+import { Image, getImage } from "astro:assets";
+import "./carousel.css";
+
+interface Props {
+  images: ImageMetadata[];
+  alt: string;
+  priority?: boolean;
+}
+
+const { images, alt, priority = false } = Astro.props;
+
+// More accurate sizes for the 2-column grid layout
+// Max container: 80rem = 1280px, then 50% for 2 columns = ~640px each
+const imageSizes = "(min-width: 1280px) 640px, (min-width: 768px) 50vw, 100vw";
+
+// Generate a unique ID for this carousel
+const carouselId = `carousel-${Math.random().toString(36).substring(7)}`;
+
+// Generate optimized image URLs for other images (but don't render them in HTML)
+const otherImagesData = await Promise.all(
+  images.slice(1).map(async (img) => {
+    const optimized = await getImage({
+      src: img,
+      widths: [400, 600, 800, 1024],
+      formats: ["webp"],
+    });
+    return {
+      src: optimized.src,
+      srcset: optimized.srcSet.attribute,
+    };
+  })
+);
+---
+
+<div class="product-carousel lightbox-gallery" id={carouselId} data-image-count={images.length}>
+  <div class="carousel-images">
+    <!-- Visible carousel image -->
+    <Image
+      class="carousel-image carousel-visible"
+      src={images[0]}
+      alt={`${alt} 1`}
+      loading={priority ? "eager" : "lazy"}
+      layout="constrained"
+      priority={priority}
+      sizes={imageSizes}
+    />
+  </div>
+
+  <!-- Hidden images for lightbox only (separate from carousel) -->
+  <div class="carousel-lightbox-images" style="display: none;">
+    {
+      images.map((img, idx) => (
+        <Image
+          class="lightbox-source-image"
+          src={img}
+          alt={`${alt} ${idx + 1}`}
+          loading="lazy"
+          widths={[800, 1024, 1440, 1920]}
+          sizes="100vw"
+        />
+      ))
+    }
+  </div>
+
+  {
+    images.length > 1 && (
+      <>
+        <button class="carousel-nav carousel-prev" aria-label="Previous image">
+          <svg>
+            <use href="/sprite.svg#icon-arrow-down" />
+          </svg>
+        </button>
+        <button class="carousel-nav carousel-next" aria-label="Next image">
+          <svg>
+            <use href="/sprite.svg#icon-arrow-down" />
+          </svg>
+        </button>
+        <div class="carousel-counter"></div>
+      </>
+    )
+  }
+</div>
+
+<!-- Store image data in a script tag (URLs only, won't trigger loading) -->
+<script is:inline define:vars={{ carouselId, otherImagesData, alt }}>
+  window[`carouselData_${carouselId}`] = {
+    otherImagesData,
+    alt,
+  };
+</script>
+
+<script>
+  // Initialize all carousels on the page
+  function initCarousels() {
+    const carousels = document.querySelectorAll(".product-carousel");
+
+    carousels.forEach((carousel) => {
+      let currentIndex = 0;
+      const carouselId = carousel.id;
+      const imageCount = parseInt(
+        carousel.getAttribute("data-image-count") || "1",
+      );
+      const mainImage = carousel.querySelector(
+        ".carousel-image",
+      ) as HTMLImageElement;
+      const imagePool = carousel.querySelector(
+        ".carousel-image-pool",
+      ) as HTMLElement;
+      const prevBtn = carousel.querySelector(".carousel-prev");
+      const nextBtn = carousel.querySelector(".carousel-next");
+      const counter = carousel.querySelector(
+        ".carousel-counter",
+      ) as HTMLElement;
+
+      if (!mainImage || !prevBtn || !nextBtn || imageCount <= 1) return;
+
+      // Get image data from window object
+      const carouselData = (window as any)[`carouselData_${carouselId}`];
+      if (!carouselData) return;
+
+      const { otherImagesData, alt } = carouselData;
+
+      // Build complete array of image data (first image + others)
+      const allImageData = [
+        {
+          src: mainImage.src,
+          srcset: mainImage.srcset,
+          alt: mainImage.alt,
+        },
+        ...otherImagesData.map((data: any, idx: number) => ({
+          src: data.src,
+          srcset: data.srcset,
+          alt: `${alt} ${idx + 2}`,
+        })),
+      ];
+
+      // Track which images have been preloaded
+      const preloadedImages = new Set<number>([0]);
+
+      // Preload an image by creating an Image object
+      function preloadImage(index: number) {
+        if (preloadedImages.has(index)) return;
+
+        const data = allImageData[index];
+        const img = new Image();
+        img.srcset = data.srcset;
+        img.src = data.src;
+        preloadedImages.add(index);
+      }
+
+      // Preload adjacent images
+      function preloadAdjacentImages() {
+        const prevIndex =
+          currentIndex === 0 ? imageCount - 1 : currentIndex - 1;
+        const nextIndex = currentIndex === imageCount - 1 ? 0 : currentIndex + 1;
+
+        [prevIndex, nextIndex].forEach((idx) => {
+          preloadImage(idx);
+        });
+      }
+
+      // Update counter display
+      function updateCounter() {
+        if (counter) {
+          counter.textContent = `${currentIndex + 1} / ${imageCount}`;
+        }
+      }
+
+      // Show image at given index with fade transition
+      function showImage(index: number) {
+        const data = allImageData[index];
+
+        // Fade out current image
+        mainImage.style.opacity = "0";
+
+        // After fade completes, swap the image
+        setTimeout(() => {
+          mainImage.src = data.src;
+          mainImage.srcset = data.srcset;
+          mainImage.alt = data.alt;
+
+          // Force reflow
+          void mainImage.offsetWidth;
+
+          // Fade in
+          mainImage.style.opacity = "1";
+        }, 300);
+
+        currentIndex = index;
+        updateCounter();
+        preloadAdjacentImages();
+      }
+
+      // Initialize counter display
+      updateCounter();
+
+      // Navigation handlers
+      prevBtn.addEventListener("click", () => {
+        const newIndex = currentIndex === 0 ? imageCount - 1 : currentIndex - 1;
+        showImage(newIndex);
+      });
+
+      nextBtn.addEventListener("click", () => {
+        const newIndex = currentIndex === imageCount - 1 ? 0 : currentIndex + 1;
+        showImage(newIndex);
+      });
+
+      // Touch/swipe support
+      let touchStartX = 0;
+      let touchEndX = 0;
+      const minSwipeDistance = 50; // Minimum distance for a swipe in pixels
+
+      carousel.addEventListener("touchstart", (e) => {
+        const touchEvent = e as TouchEvent;
+        touchStartX = touchEvent.changedTouches[0].screenX;
+      }, { passive: true });
+
+      carousel.addEventListener("touchend", (e) => {
+        const touchEvent = e as TouchEvent;
+        touchEndX = touchEvent.changedTouches[0].screenX;
+        handleSwipe();
+      }, { passive: true });
+
+      function handleSwipe() {
+        const swipeDistance = touchEndX - touchStartX;
+
+        // Swipe left (next image)
+        if (swipeDistance < -minSwipeDistance) {
+          const newIndex = currentIndex === imageCount - 1 ? 0 : currentIndex + 1;
+          showImage(newIndex);
+        }
+
+        // Swipe right (previous image)
+        if (swipeDistance > minSwipeDistance) {
+          const newIndex = currentIndex === 0 ? imageCount - 1 : currentIndex - 1;
+          showImage(newIndex);
+        }
+      }
+    });
+  }
+
+  // Initialize on DOMContentLoaded
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initCarousels);
+  } else {
+    initCarousels();
+  }
+</script>

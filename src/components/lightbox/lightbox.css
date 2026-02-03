@@ -1,0 +1,113 @@
+/* Lightbox */
+#lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+#lightbox.active {
+  display: flex;
+}
+
+/* Close */
+#lightbox-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 2rem;
+  z-index: 1001;
+  cursor: pointer;
+  display: flex;
+}
+#lightbox-close svg {
+  color: gray;
+  width: 2rem;
+  height: 2rem;
+}
+#lightbox-close svg:hover {
+  color: white;
+}
+
+/* Next/Back Nav */
+#lightbox-prev,
+#lightbox-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+}
+#lightbox-prev svg,
+#lightbox-next svg {
+  color: gray;
+  width: 3rem;
+  height: 3rem;
+  pointer-events: none;
+}
+#lightbox-close svg {
+  pointer-events: none;
+}
+@media (max-width: 1024px) {
+  #lightbox-prev,
+  #lightbox-next {
+    top: auto;
+    transform: none;
+    bottom: 1rem;
+  }
+}
+
+#lightbox-prev {
+  left: 0;
+  rotate: 90deg;
+}
+#lightbox-next {
+  right: 0;
+  rotate: 270deg;
+}
+
+#lightbox-prev:hover svg,
+#lightbox-next svg:hover {
+  color: white;
+}
+
+/* Hide arrows when only one image */
+#lightbox.single-image #lightbox-prev,
+#lightbox.single-image #lightbox-next {
+  display: none;
+}
+
+/* Content */
+.lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  pointer-events: none; /* Let clicks pass through to background */
+}
+
+#lightbox img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  pointer-events: auto; /* Image itself captures clicks but won't close lightbox */
+  display: block;
+}
+
+/* Counter */
+#lightbox-counter {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: black;
+  background: white;
+  padding: 0.25rem 1rem;
+  border-radius: 1.5rem;
+  font-size: var(--font-size--small);
+}

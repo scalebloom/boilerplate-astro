@@ -1,0 +1,19 @@
+.divider-bottom, .divider-top {
+  mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='20'%3E%3Cpath d='M0 20V10c35-34.6 35 34.6 70 0v10z'/%3E%3C/svg%3E");
+  mask-size: contain;
+  background-color: var(--clr-base);
+  position: absolute;
+  left: 0;
+  height: 1.25rem;
+  overflow: hidden;
+  width: 100%;
+}
+
+.divider-bottom {
+  bottom: 0; 
+}
+
+.divider-top {
+  top: 0; 
+  transform: rotate(180deg);
+}

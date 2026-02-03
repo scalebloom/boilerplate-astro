@@ -1,0 +1,255 @@
+---
+import "./lightbox.css";
+---
+
+<!-- Lightbox HTML structure (will be populated by JavaScript) -->
+<div id="lightbox">
+  <div id="lightbox-close">
+    <svg><use href="/sprite.svg#icon-close"></use></svg>
+  </div>
+  <div id="lightbox-prev">
+    <svg><use href="/sprite.svg#icon-arrow-down"></use></svg>
+  </div>
+  <div class="lightbox-content">
+    <img id="lightbox-img" src="" alt="" />
+  </div>
+  <div id="lightbox-next">
+    <svg><use href="/sprite.svg#icon-arrow-down"></use></svg>
+  </div>
+  <div id="lightbox-counter"></div>
+</div>
+
+<script>
+  class Lightbox {
+    lightbox: HTMLElement;
+    lightboxImg: HTMLImageElement;
+    lightboxClose: HTMLElement;
+    lightboxPrev: HTMLElement;
+    lightboxNext: HTMLElement;
+    lightboxCounter: HTMLElement;
+    images: HTMLImageElement[];
+    currentIndex: number;
+    currentGallery: HTMLElement | null;
+    preloadedImages: Set<number>;
+    keyboardHandler: ((e: KeyboardEvent) => void) | null;
+
+    constructor() {
+      this.lightbox = document.getElementById("lightbox")!;
+      this.lightboxImg = document.getElementById("lightbox-img") as HTMLImageElement;
+      this.lightboxClose = document.getElementById("lightbox-close")!;
+      this.lightboxPrev = document.getElementById("lightbox-prev")!;
+      this.lightboxNext = document.getElementById("lightbox-next")!;
+      this.lightboxCounter = document.getElementById("lightbox-counter")!;
+
+      this.images = [];
+      this.currentIndex = 0;
+      this.currentGallery = null;
+      this.preloadedImages = new Set();
+      this.keyboardHandler = null;
+
+      this.init();
+    }
+
+    init() {
+      // Use event delegation for better performance
+      document.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        const img = target.closest(".lightbox-gallery img") as HTMLImageElement;
+        if (img) {
+          // Only trigger on carousel visible image, not hidden ones
+          if (!img.classList.contains("carousel-visible")) {
+            return;
+          }
+
+          // Find which gallery this image belongs to
+          const gallery = img.closest(".lightbox-gallery") as HTMLElement;
+          if (gallery) {
+            // Get lightbox source images only (not the visible carousel image)
+            const galleryImages = Array.from(
+              gallery.querySelectorAll(".lightbox-source-image"),
+            ) as HTMLImageElement[];
+
+            console.log("Opening lightbox with", galleryImages.length, "images");
+
+            if (galleryImages.length > 0) {
+              // Open at index 0 (first image) since we can't determine which carousel image is showing
+              this.openLightbox(gallery, galleryImages, 0);
+            }
+          }
+        }
+      });
+
+      // Lightbox controls
+      this.lightboxClose.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.closeLightbox();
+      });
+      this.lightboxPrev.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.prevImage();
+      });
+      this.lightboxNext.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.nextImage();
+      });
+
+      // Click outside image to close
+      this.lightbox.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+
+        // Close if clicking the background (#lightbox)
+        // The image and controls have pointer-events so they won't trigger this
+        if (target.id === "lightbox") {
+          this.closeLightbox();
+        }
+      });
+
+      // Touch/swipe support
+      this.setupTouchHandlers();
+
+      // Setup debounced resize handler
+      this.setupResizeHandler();
+    }
+
+    addKeyboardListeners() {
+      this.keyboardHandler = (e: KeyboardEvent) => {
+        switch (e.key) {
+          case "Escape":
+            this.closeLightbox();
+            break;
+          case "ArrowLeft":
+            this.prevImage();
+            break;
+          case "ArrowRight":
+            this.nextImage();
+            break;
+        }
+      };
+      document.addEventListener("keydown", this.keyboardHandler);
+    }
+
+    removeKeyboardListeners() {
+      if (this.keyboardHandler) {
+        document.removeEventListener("keydown", this.keyboardHandler);
+        this.keyboardHandler = null;
+      }
+    }
+
+    openLightbox(gallery: HTMLElement, galleryImages: HTMLImageElement[], index: number) {
+      this.currentGallery = gallery;
+      this.images = galleryImages;
+      this.currentIndex = index;
+      this.preloadedImages.clear();
+
+      console.log("Lightbox opened:", {
+        totalImages: this.images.length,
+        startIndex: index,
+        firstImageSrc: this.images[0]?.src
+      });
+
+      this.showImage();
+      this.lightbox.classList.add("active");
+      this.lightbox.classList.toggle("single-image", this.images.length === 1);
+      document.body.style.overflow = "hidden";
+      this.addKeyboardListeners();
+    }
+
+    closeLightbox() {
+      this.lightbox.classList.remove("active");
+      document.body.style.overflow = "";
+      this.removeKeyboardListeners();
+    }
+
+    showImage() {
+      const img = this.images[this.currentIndex];
+      this.lightboxImg.src = img.src;
+      this.lightboxImg.srcset = img.srcset || "";
+      this.lightboxImg.alt = img.alt || `Image ${this.currentIndex + 1}`;
+      this.updateCounter();
+      this.preloadAdjacentImages();
+    }
+
+    prevImage() {
+      this.currentIndex =
+        this.currentIndex === 0 ? this.images.length - 1 : this.currentIndex - 1;
+      this.showImage();
+    }
+
+    nextImage() {
+      this.currentIndex =
+        this.currentIndex === this.images.length - 1 ? 0 : this.currentIndex + 1;
+      this.showImage();
+    }
+
+    updateCounter() {
+      this.lightboxCounter.textContent = `${this.currentIndex + 1} / ${this.images.length}`;
+    }
+
+    preloadAdjacentImages() {
+      const preloadIndexes = [
+        this.currentIndex - 1 >= 0
+          ? this.currentIndex - 1
+          : this.images.length - 1,
+        this.currentIndex + 1 < this.images.length ? this.currentIndex + 1 : 0,
+      ];
+
+      preloadIndexes.forEach((index) => {
+        if (index !== this.currentIndex && !this.preloadedImages.has(index)) {
+          const img = new Image();
+          const sourceImg = this.images[index];
+          img.src = sourceImg.src;
+          img.srcset = sourceImg.srcset || "";
+          this.preloadedImages.add(index);
+        }
+      });
+    }
+
+    setupResizeHandler() {
+      let resizeTimeout: number;
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = window.setTimeout(() => {
+          if (this.lightbox.classList.contains("active")) {
+            this.lightboxImg.style.display = "none";
+            void this.lightboxImg.offsetHeight;
+            this.lightboxImg.style.display = "";
+          }
+        }, 150);
+      });
+    }
+
+    setupTouchHandlers() {
+      let touchStartX = 0;
+      let touchEndX = 0;
+      const minSwipeDistance = 50; // Minimum distance for a swipe in pixels
+
+      this.lightbox.addEventListener("touchstart", (e: TouchEvent) => {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+
+      this.lightbox.addEventListener("touchend", (e: TouchEvent) => {
+        touchEndX = e.changedTouches[0].screenX;
+        const swipeDistance = touchEndX - touchStartX;
+
+        // Swipe left (next image)
+        if (swipeDistance < -minSwipeDistance) {
+          this.nextImage();
+        }
+
+        // Swipe right (previous image)
+        if (swipeDistance > minSwipeDistance) {
+          this.prevImage();
+        }
+      }, { passive: true });
+    }
+  }
+
+  // Initialize lightbox when DOM is ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      (window as any).lightboxInstance = new Lightbox();
+    });
+  } else {
+    (window as any).lightboxInstance = new Lightbox();
+  }
+</script>

@@ -1,0 +1,71 @@
+---
+// CSS
+import "../styles/global.css";
+// Components
+import Header from "../components/header/Header.astro";
+import Footer from "../components/footer/Footer.astro";
+// Schema
+import LocalBusinessSchema from "../components/schema/LocalBusinessSchema.astro";
+import BreadcrumbSchema from "../components/schema/BreadcrumbSchema.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  canonical?: string;
+  includeLocalBusinessSchema?: boolean;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  image,
+  canonical,
+  includeLocalBusinessSchema = false,
+  noindex = false,
+} = Astro.props;
+const canonicalURL = canonical || Astro.url.pathname;
+const fullImageURL = image ? new URL(image, Astro.site).href : undefined;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={new URL(canonicalURL, Astro.site).href} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {fullImageURL && <meta property="og:image" content={fullImageURL} />}
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    {fullImageURL && <meta property="twitter:image" content={fullImageURL} />}
+    <!-- Canonical URL -->
+    <link rel="canonical" href={new URL(canonicalURL, Astro.site).href} />
+    <!-- Sitemap -->
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- Schema.org Structured Data -->
+    {includeLocalBusinessSchema && <LocalBusinessSchema />}
+    <BreadcrumbSchema currentPath={Astro.url.pathname} />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

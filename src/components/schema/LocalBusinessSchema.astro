@@ -1,0 +1,77 @@
+---
+/**
+ * LocalBusiness Schema Component
+ * Provides structured data for local search visibility, Google Maps integration,
+ * and "near me" searches. Critical for local SEO.
+ *
+ * @see https://schema.org/LocalBusiness
+ */
+
+import { siteConfig } from "../../config/site";
+
+// Build the LocalBusiness schema
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "@id": `${siteConfig.url}/#business`,
+  name: siteConfig.name,
+  legalName: siteConfig.legalName,
+  url: siteConfig.url,
+  description: siteConfig.description,
+  logo: `${siteConfig.url}${siteConfig.branding.logo}`,
+  image: `${siteConfig.url}${siteConfig.branding.logo}`,
+
+  // Contact Information
+  telephone: siteConfig.contact.phone,
+  email: siteConfig.contact.email,
+
+  // Address
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: siteConfig.location.streetAddress,
+    addressLocality: siteConfig.location.addressLocality,
+    addressRegion: siteConfig.location.addressRegion,
+    postalCode: siteConfig.location.postalCode,
+    addressCountry: siteConfig.location.addressCountry,
+  },
+
+  // Service Area
+  areaServed: {
+    "@type": "City",
+    name: siteConfig.location.addressLocality,
+    addressRegion: siteConfig.location.addressRegion,
+  },
+
+  // Opening Hours
+  openingHoursSpecification: {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: siteConfig.contact.hoursStructured.dayOfWeek,
+    opens: siteConfig.contact.hoursStructured.opens,
+    closes: siteConfig.contact.hoursStructured.closes,
+  },
+
+  // Price Range
+  priceRange: siteConfig.business.priceRange,
+
+  // Business Category
+  category: siteConfig.business.category,
+
+  // Service Type
+  serviceType: [
+    "Kids Party Equipment Rental",
+    "Soft Play Rental",
+    "Party Equipment Delivery",
+  ],
+
+  // Payment Methods
+  paymentAccepted: ["Cash", "Credit Card", "CashApp"],
+
+  // Currencies Accepted
+  currenciesAccepted: "USD",
+
+  // Social Media Profiles
+  sameAs: Object.values(siteConfig.social).filter(Boolean),
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

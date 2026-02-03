@@ -1,0 +1,67 @@
+---
+import "./header.css";
+import Logo from "../logo.astro";
+---
+
+<header>
+  <div class="header-inner-container">
+    <!-- Logo -->
+    <a
+      class="header-logo-link-wrapper"
+      href="/"
+      rel="home"
+      aria-current="page"
+      aria-label="Home"
+    >
+      <Logo />
+    </a>
+    <!-- Header col 2 -->
+    <div class="header-col-2">
+      <!-- Nav Toggle Button-->
+      <button
+        type="button"
+        popovertarget="header-nav"
+        class="nav-toggle"
+        aria-label="Toggle navigation menu"
+        aria-expanded="false"
+      >
+        <span class="nav-toggle-icon">
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+        </span>
+        <span class="sr-only">Toggle navigation menu</span>
+      </button>
+      <!-- Nav -->
+      <nav id="header-nav" popover role="navigation">
+        <ul class="nav-list">
+          <li class="nav-list-item">
+            <a href="/" class="nav-link">Home</a>
+          </li>
+          <li class="nav-list-item">
+            <a href="/about/" class="nav-link">About</a>
+          </li>
+          <li class="nav-list-item">
+            <a href="/contact/" class="nav-link">Contact</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Set aria-expanded for accessibility (screen readers)
+  // Note: The hamburger animation is handled purely by CSS using :has() and :popover-open
+  // This script only manages the aria-expanded attribute for assistive technologies
+  const navToggle = document.querySelector('[popovertarget="header-nav"]');
+  const nav = document.getElementById("header-nav");
+
+  if (navToggle && nav) {
+    nav.addEventListener("toggle", (e) => {
+      navToggle.setAttribute(
+        "aria-expanded",
+        String((e as ToggleEvent).newState === "open"),
+      );
+    });
+  }
+</script>

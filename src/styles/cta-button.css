@@ -1,0 +1,42 @@
+.cta-button {
+  font-size: var(--font-size--medium);
+  font-weight:600;
+  text-decoration:none;
+  text-wrap: balance;
+  padding:.75rem 2.5rem;
+  border-radius:var(--squircle-m);
+  corner-shape: var(--corner-shape-squircle);
+  background-color: var(--clr-accent-1);
+  color: var(--clr-base);
+  transition:all 0.2s ease-in-out;
+  width: fit-content;
+  /*icon stuff*/
+    display: flex; gap: .45rem;
+    align-items: center; justify-content: center;
+
+  /*Buttons - arrow*/
+  &:not(.loading):after {
+    content:"";width:1.5rem;height:1.5rem;
+    margin-top:2px/*To adjust for btn text line height*/;
+    transition:transform 0.2s ease;
+    mask: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20d%3D%22M%202%2010.415%20L%202%208.93%20L%2015.545%208.93%20L%2011.615%205%20L%2013.49%205%20L%2018.14%209.665%20L%2013.475%2014.33%20L%2011.6%2014.33%20L%2015.515%2010.415%20Z%22%20fill%3D%22%232e2925%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E");
+    mask-size: contain;
+    background-color: var(--clr-base);
+  }
+
+  /*Buttons - hover*/
+  &:not(.loading):hover {
+    background-color:var(--clr-accent-2);
+    color:var(--clr-contrast);
+
+    &:after {
+      transform:translateX(6px);
+      background-color: var(--clr-contrast);
+    }
+  }
+
+  /*Buttons - wide on mobile*/
+  @media(max-width:1024px) {
+    width:100%;
+  }
+}
