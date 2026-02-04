@@ -1,10 +1,10 @@
-# Astro Boilerplate
+# README
 
 ## Logo
 
 The logo exists in two places:
 
-- **`public/logo.svg`** - Static file for structured data/SEO (used by `LocalBusinessSchema.astro`)
+- **`public/logo.svg`** - Static file for structured data/SEO (used by `BusinessSchema.astro`)
 - **`src/components/logo.astro`** - Inline SVG component with hover animation (used in Header and Footer)
 
 Both files must be updated when changing the logo. The duplication is intentional: inline SVG is required for CSS animations, while the public file provides a URL for search engines.
@@ -17,15 +17,23 @@ Both files must be updated when changing the logo. The duplication is intentiona
 
 Automatically included on **all pages**. Generates breadcrumb schema based on the current URL path.
 
-### LocalBusinessSchema
+### BusinessSchema
 
-Opt-in per page. Used it on 1 page such as home, about, or contact — not on every page. Include it by passing the prop to Layout:
+Generates schema.org markup based on `business.type` in [site.ts](src/config/site.ts). Supported types:
+
+- **`LocalBusiness`** - Physical location serving local customers
+- **`Organization`** - Companies, non-profits, institutions
+- **`OnlineBusiness`** - E-commerce, SaaS, digital products
+
+For better SEO, use a specific LocalBusiness subtype: `Restaurant`, `Dentist`, `Attorney`, `Store`, etc. See [full list](https://schema.org/LocalBusiness#subtypes).
+
+Opt-in per page. Use on 1 page such as home, about, or contact — not on every page. Include it by passing the prop to Layout:
 
 ```astro
 <Layout
   title="Home"
   description="Welcome"
-  includeLocalBusinessSchema={true}
+  includeBusinessSchema={true}
 >
 ```
 

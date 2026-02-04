@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:developers.google.com)",
+      "WebFetch(domain:schema.org)",
+      "WebSearch",
+      "Bash(python -m json.tool:*)"
+    ]
+  }
+}

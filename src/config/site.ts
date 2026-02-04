@@ -4,6 +4,26 @@
  */
 
 export const siteConfig: SiteConfig = {
+  // ===========================================================================
+  // Business Type (determines which schema.org markup is generated)
+  // ===========================================================================
+  // Options:
+  //   - "LocalBusiness"  → Physical location serving local customers
+  //   - "Organization"   → Companies, non-profits, institutions
+  //   - "OnlineBusiness" → E-commerce, SaaS, digital products
+  //
+  // Tip: For local businesses, a specific subtype improves SEO.
+  // Set type to "Restaurant", "Dentist", "Attorney", "Store", etc.
+  // Full list: https://schema.org/LocalBusiness#subtypes
+  // ===========================================================================
+  business: {
+    type: "LocalBusiness",
+    owner: "Jane Doe",
+    priceRange: "$$",
+    paymentAccepted: ["Cash", "Credit Card"],
+    currenciesAccepted: "USD",
+  },
+
   // Business Identity
   name: "Your Business Name",
   legalName: "Your Legal Entity LLC",
@@ -24,7 +44,7 @@ export const siteConfig: SiteConfig = {
     },
   },
 
-  // Location
+  // Location (required for LocalBusiness, optional for others)
   location: {
     serviceArea: "Your service area",
     streetAddress: "123 Main Street",
@@ -32,17 +52,11 @@ export const siteConfig: SiteConfig = {
     addressRegion: "CA",
     postalCode: "12345",
     addressCountry: "US",
-  },
-
-  // Business Details
-  business: {
-    owner: "Jane Doe",
-    priceRange: "$$",
-    type: "LocalBusiness",
-    category: "Professional Services",
-    serviceTypes: ["Service One", "Service Two", "Service Three"],
-    paymentAccepted: ["Cash", "Credit Card"],
-    currenciesAccepted: "USD",
+    // Geo coordinates improve "near me" search visibility (use Google Maps to find yours)
+    geo: {
+      latitude: 34.0522,
+      longitude: -118.2437,
+    },
   },
 
   // Branding
@@ -74,6 +88,11 @@ interface ContactConfig {
   };
 }
 
+interface GeoConfig {
+  latitude: number;
+  longitude: number;
+}
+
 interface LocationConfig {
   serviceArea: string;
   streetAddress?: string;
@@ -81,14 +100,16 @@ interface LocationConfig {
   addressRegion: string;
   postalCode?: string;
   addressCountry: string;
+  geo?: GeoConfig;
 }
 
+// Common types, but any schema.org type string is accepted (e.g., "Restaurant", "Dentist")
+type BusinessType = "LocalBusiness" | "Organization" | "OnlineBusiness" | (string & {});
+
 interface BusinessConfig {
+  type: BusinessType;
   owner: string;
   priceRange?: string;
-  type: string;
-  category: string;
-  serviceTypes: string[];
   paymentAccepted?: string[];
   currenciesAccepted?: string;
 }
@@ -106,6 +127,7 @@ interface SocialConfig {
 }
 
 export interface SiteConfig {
+  business: BusinessConfig;
   name: string;
   legalName: string;
   url: string;
@@ -113,7 +135,6 @@ export interface SiteConfig {
   slogan: string;
   contact: ContactConfig;
   location: LocationConfig;
-  business: BusinessConfig;
   branding: BrandingConfig;
   social: SocialConfig;
 }

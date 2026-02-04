@@ -5,7 +5,7 @@ import "../styles/global.css";
 import Header from "../components/header/Header.astro";
 import Footer from "../components/footer/Footer.astro";
 // Schema
-import LocalBusinessSchema from "../components/schema/LocalBusinessSchema.astro";
+import BusinessSchema from "../components/schema/BusinessSchema.astro";
 import BreadcrumbSchema from "../components/schema/BreadcrumbSchema.astro";
 
 interface Props {
@@ -13,7 +13,7 @@ interface Props {
   description: string;
   image?: string;
   canonical?: string;
-  includeLocalBusinessSchema?: boolean;
+  includeBusinessSchema?: boolean;
   noindex?: boolean;
 }
 
@@ -22,7 +22,7 @@ const {
   description,
   image,
   canonical,
-  includeLocalBusinessSchema = false,
+  includeBusinessSchema = false,
   noindex = false,
 } = Astro.props;
 const canonicalURL = canonical || Astro.url.pathname;
@@ -54,7 +54,7 @@ const fullImageURL = new URL(image || "/og-image.webp", Astro.site).href;
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon/favicon-192.png" />
     <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
     <!-- Schema.org Structured Data -->
-    {includeLocalBusinessSchema && <LocalBusinessSchema />}
+    {includeBusinessSchema && <BusinessSchema />}
     <BreadcrumbSchema currentPath={Astro.url.pathname} />
   </head>
   <body>

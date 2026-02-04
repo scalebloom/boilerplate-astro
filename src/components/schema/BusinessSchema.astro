@@ -1,0 +1,118 @@
+---
+/**
+ * Business Schema Component
+ * Generates appropriate schema.org markup based on business.type in site config.
+ *
+ * Common types:
+ *   - LocalBusiness  → Physical location serving local customers
+ *   - Organization   → Companies, non-profits, institutions
+ *   - OnlineBusiness → E-commerce, SaaS, digital products
+ *
+ * For better SEO, use specific LocalBusiness subtypes:
+ *   Restaurant, Dentist, Attorney, Store, RealEstateAgent, etc.
+ *   Full list: https://schema.org/LocalBusiness#subtypes
+ *
+ * @see https://schema.org/LocalBusiness
+ * @see https://schema.org/Organization
+ * @see https://schema.org/OnlineBusiness
+ */
+
+import { siteConfig } from "../../config/site";
+
+const businessType = siteConfig.business.type;
+
+// Base schema properties shared across all types
+const baseSchema = {
+  "@context": "https://schema.org",
+  "@type": businessType,
+  "@id": `${siteConfig.url}/#business`,
+  name: siteConfig.name,
+  url: siteConfig.url,
+  description: siteConfig.description,
+  logo: `${siteConfig.url}${siteConfig.branding.logo}`,
+  image: `${siteConfig.url}${siteConfig.branding.logo}`,
+  telephone: siteConfig.contact.phone,
+  email: siteConfig.contact.email,
+  sameAs: Object.values(siteConfig.social).filter(Boolean),
+};
+
+// Address object
+const addressSchema = {
+  "@type": "PostalAddress",
+  ...(siteConfig.location.streetAddress && {
+    streetAddress: siteConfig.location.streetAddress,
+  }),
+  addressLocality: siteConfig.location.addressLocality,
+  addressRegion: siteConfig.location.addressRegion,
+  ...(siteConfig.location.postalCode && {
+    postalCode: siteConfig.location.postalCode,
+  }),
+  addressCountry: siteConfig.location.addressCountry,
+};
+
+// Geo coordinates (improves "near me" search visibility)
+const geoSchema = siteConfig.location.geo
+  ? {
+      "@type": "GeoCoordinates",
+      latitude: siteConfig.location.geo.latitude,
+      longitude: siteConfig.location.geo.longitude,
+    }
+  : null;
+
+// Area served
+const areaServedSchema = {
+  "@type": "City",
+  name: siteConfig.location.addressLocality,
+  addressRegion: siteConfig.location.addressRegion,
+};
+
+// Opening hours
+const openingHoursSchema = siteConfig.contact.hoursStructured
+  ? {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: siteConfig.contact.hoursStructured.dayOfWeek,
+      opens: siteConfig.contact.hoursStructured.opens,
+      closes: siteConfig.contact.hoursStructured.closes,
+    }
+  : null;
+
+// Build schema based on business type
+let schema: Record<string, unknown>;
+
+switch (businessType) {
+  case "Organization":
+    schema = {
+      ...baseSchema,
+      legalName: siteConfig.legalName,
+      ...(siteConfig.location.streetAddress && { address: addressSchema }),
+      founder: siteConfig.business.owner,
+    };
+    break;
+
+  case "OnlineBusiness":
+    schema = {
+      ...baseSchema,
+      legalName: siteConfig.legalName,
+      ...(siteConfig.business.priceRange && { priceRange: siteConfig.business.priceRange }),
+      ...(siteConfig.business.paymentAccepted && { paymentAccepted: siteConfig.business.paymentAccepted }),
+      ...(siteConfig.business.currenciesAccepted && { currenciesAccepted: siteConfig.business.currenciesAccepted }),
+    };
+    break;
+
+  // LocalBusiness and all its subtypes (Restaurant, Dentist, Store, etc.)
+  default:
+    schema = {
+      ...baseSchema,
+      legalName: siteConfig.legalName,
+      address: addressSchema,
+      ...(geoSchema && { geo: geoSchema }),
+      areaServed: areaServedSchema,
+      ...(openingHoursSchema && { openingHoursSpecification: openingHoursSchema }),
+      ...(siteConfig.business.priceRange && { priceRange: siteConfig.business.priceRange }),
+      ...(siteConfig.business.paymentAccepted && { paymentAccepted: siteConfig.business.paymentAccepted }),
+      ...(siteConfig.business.currenciesAccepted && { currenciesAccepted: siteConfig.business.currenciesAccepted }),
+    };
+}
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

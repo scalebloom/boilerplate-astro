@@ -8,14 +8,14 @@ interface Props {
   description: string;
   image?: string;
   canonical?: string;
-  includeLocalBusinessSchema?: boolean;
+  includeBusinessSchema?: boolean;
   maxWidth?: string;
   frontmatter?: {
     title: string;
     description: string;
     image?: string;
     canonical?: string;
-    includeLocalBusinessSchema?: boolean;
+    includeBusinessSchema?: boolean;
     maxWidth?: string;
   };
 }
@@ -25,7 +25,7 @@ const {
   description,
   image,
   canonical,
-  includeLocalBusinessSchema,
+  includeBusinessSchema,
   maxWidth = "44rem",
 } = (Astro.props as any).frontmatter || Astro.props;
 ---
@@ -35,7 +35,7 @@ const {
   description={description}
   image={image}
   canonical={canonical}
-  includeLocalBusinessSchema={includeLocalBusinessSchema}
+  includeBusinessSchema={includeBusinessSchema}
 >
   <section style="padding: 1.5rem 1.25rem;">
     <div style={`max-width: ${maxWidth};margin-inline: auto;text-wrap:pretty`}>
