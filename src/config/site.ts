@@ -3,13 +3,12 @@
  * Used across schema markup, meta tags, and components
  */
 
-export const siteConfig = {
+export const siteConfig: SiteConfig = {
   // Business Identity
   name: "Your Business Name",
   legalName: "Your Legal Entity LLC",
   url: "https://www.example.com",
-  description:
-    "Your business description goes here. Describe what you do, who you serve, and what makes you unique.",
+  description: "Your business description goes here. Describe what you do, who you serve, and what makes you unique.",
   slogan: "Your Tagline Here",
 
   // Contact Information
@@ -57,7 +56,64 @@ export const siteConfig = {
     facebook: "https://www.facebook.com/yourbusiness",
     instagram: "https://www.instagram.com/yourbusiness/",
   },
-} as const;
+};
 
-// Type exports for use in components
-export type SiteConfig = typeof siteConfig;
+// ============================================================================
+// Type Definitions (optional fields marked with "?")
+// ============================================================================
+
+interface ContactConfig {
+  email: string;
+  phone: string;
+  phoneDisplay: string;
+  hours?: string;
+  hoursStructured?: {
+    dayOfWeek: string[];
+    opens: string;
+    closes: string;
+  };
+}
+
+interface LocationConfig {
+  serviceArea: string;
+  streetAddress?: string;
+  addressLocality: string;
+  addressRegion: string;
+  postalCode?: string;
+  addressCountry: string;
+}
+
+interface BusinessConfig {
+  owner: string;
+  priceRange?: string;
+  type: string;
+  category: string;
+  serviceTypes: string[];
+  paymentAccepted?: string[];
+  currenciesAccepted?: string;
+}
+
+interface BrandingConfig {
+  logo: string;
+  favicon: string;
+}
+
+interface SocialConfig {
+  facebook?: string;
+  instagram?: string;
+  linkedin?: string;
+  twitter?: string;
+}
+
+export interface SiteConfig {
+  name: string;
+  legalName: string;
+  url: string;
+  description: string;
+  slogan: string;
+  contact: ContactConfig;
+  location: LocationConfig;
+  business: BusinessConfig;
+  branding: BrandingConfig;
+  social: SocialConfig;
+}

@@ -25,13 +25,17 @@ const schema = {
   telephone: siteConfig.contact.phone,
   email: siteConfig.contact.email,
 
-  // Address
+  // Address (conditionally includes optional fields)
   address: {
     "@type": "PostalAddress",
-    streetAddress: siteConfig.location.streetAddress,
+    ...(siteConfig.location.streetAddress && {
+      streetAddress: siteConfig.location.streetAddress,
+    }),
     addressLocality: siteConfig.location.addressLocality,
     addressRegion: siteConfig.location.addressRegion,
-    postalCode: siteConfig.location.postalCode,
+    ...(siteConfig.location.postalCode && {
+      postalCode: siteConfig.location.postalCode,
+    }),
     addressCountry: siteConfig.location.addressCountry,
   },
 
@@ -42,16 +46,20 @@ const schema = {
     addressRegion: siteConfig.location.addressRegion,
   },
 
-  // Opening Hours
-  openingHoursSpecification: {
-    "@type": "OpeningHoursSpecification",
-    dayOfWeek: siteConfig.contact.hoursStructured.dayOfWeek,
-    opens: siteConfig.contact.hoursStructured.opens,
-    closes: siteConfig.contact.hoursStructured.closes,
-  },
+  // Opening Hours (only included if defined)
+  ...(siteConfig.contact.hoursStructured && {
+    openingHoursSpecification: {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: siteConfig.contact.hoursStructured.dayOfWeek,
+      opens: siteConfig.contact.hoursStructured.opens,
+      closes: siteConfig.contact.hoursStructured.closes,
+    },
+  }),
 
-  // Price Range
-  priceRange: siteConfig.business.priceRange,
+  // Price Range (only included if defined)
+  ...(siteConfig.business.priceRange && {
+    priceRange: siteConfig.business.priceRange,
+  }),
 
   // Business Category
   category: siteConfig.business.category,
@@ -59,13 +67,17 @@ const schema = {
   // Service Type
   serviceType: siteConfig.business.serviceTypes,
 
-  // Payment Methods
-  paymentAccepted: siteConfig.business.paymentAccepted,
+  // Payment Methods (only included if defined)
+  ...(siteConfig.business.paymentAccepted && {
+    paymentAccepted: siteConfig.business.paymentAccepted,
+  }),
 
-  // Currencies Accepted
-  currenciesAccepted: siteConfig.business.currenciesAccepted,
+  // Currencies Accepted (only included if defined)
+  ...(siteConfig.business.currenciesAccepted && {
+    currenciesAccepted: siteConfig.business.currenciesAccepted,
+  }),
 
-  // Social Media Profiles
+  // Social Media Profiles (filters out undefined values)
   sameAs: Object.values(siteConfig.social).filter(Boolean),
 };
 ---

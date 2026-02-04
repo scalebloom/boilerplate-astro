@@ -1,5 +1,3 @@
-/* src/css/footer.css */
-
 footer {padding: 4rem 1.25rem 1.5rem 1.25rem;font-size: 1.06rem;}
 .footer-inner-container {max-width: 80rem; margin: auto;}
 .footer-cols {display: flex;flex-wrap: wrap;gap: 2rem; justify-content: space-between;}
