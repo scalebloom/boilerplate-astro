@@ -18,7 +18,10 @@ export const siteConfig: SiteConfig = {
   // ===========================================================================
   business: {
     type: "LocalBusiness",
-    owner: "Jane Doe",
+    owner: {
+      name: "Jane Doe",
+      type: "Person", // "Person" or "Organization"
+    },
     priceRange: "$$",
     paymentAccepted: ["Cash", "Credit Card"],
     currenciesAccepted: "USD",
@@ -65,10 +68,13 @@ export const siteConfig: SiteConfig = {
     favicon: "/favicon/favicon.svg",
   },
 
-  // Social Media
+  // Social Media (footer icons + schema markup)
+  // Only include platforms you use - remove or leave empty the others
   social: {
     facebook: "https://www.facebook.com/yourbusiness",
     instagram: "https://www.instagram.com/yourbusiness/",
+    // linkedin: "https://www.linkedin.com/company/yourbusiness",
+    // x: "https://x.com/yourbusiness",
   },
 };
 
@@ -106,9 +112,14 @@ interface LocationConfig {
 // Common types, but any schema.org type string is accepted (e.g., "Restaurant", "Dentist")
 type BusinessType = "LocalBusiness" | "Organization" | "OnlineBusiness" | (string & {});
 
+interface OwnerConfig {
+  name: string;
+  type: "Person" | "Organization";
+}
+
 interface BusinessConfig {
   type: BusinessType;
-  owner: string;
+  owner: OwnerConfig;
   priceRange?: string;
   paymentAccepted?: string[];
   currenciesAccepted?: string;
@@ -123,7 +134,7 @@ interface SocialConfig {
   facebook?: string;
   instagram?: string;
   linkedin?: string;
-  twitter?: string;
+  x?: string;
 }
 
 export interface SiteConfig {

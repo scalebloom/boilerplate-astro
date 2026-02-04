@@ -2,6 +2,19 @@
 import "./footer.css";
 import Logo from "../logo.astro";
 import { siteConfig } from "../../config/site";
+
+// Social platforms config - only renders if URL is defined in site.ts
+const socialPlatforms = [
+  { key: "facebook", label: "Facebook", icon: "icon-facebook" },
+  { key: "instagram", label: "Instagram", icon: "icon-instagram" },
+  { key: "linkedin", label: "LinkedIn", icon: "icon-linkedin" },
+  { key: "x", label: "X", icon: "icon-x" },
+] as const;
+
+type SocialKey = (typeof socialPlatforms)[number]["key"];
+const activeSocials = socialPlatforms.filter(
+  (p) => siteConfig.social[p.key as SocialKey]
+);
 ---
 
 <footer>
@@ -19,28 +32,22 @@ import { siteConfig } from "../../config/site";
           ><Logo />
         </a>
         <!-- Social media links -->
-        <div class="footer-social-media-icon-links">
-          <a
-            href={siteConfig.social.facebook}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Visit our Facebook page"
-          >
-            <svg class="footer-social-media-icon"
-              ><use href="/sprite.svg#icon-facebook"></use></svg
-            >
-          </a>
-          <a
-            href={siteConfig.social.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Visit our Instagram page"
-          >
-            <svg class="footer-social-media-icon"
-              ><use href="/sprite.svg#icon-instagram"></use></svg
-            >
-          </a>
-        </div>
+        {activeSocials.length > 0 && (
+          <div class="footer-social-media-icon-links">
+            {activeSocials.map((platform) => (
+              <a
+                href={siteConfig.social[platform.key as SocialKey]}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Visit our ${platform.label} page`}
+              >
+                <svg class="footer-social-media-icon">
+                  <use href={`/sprite.svg#${platform.icon}`} />
+                </svg>
+              </a>
+            ))}
+          </div>
+        )}
       </div>
       <div class="footer-col">
         <h3 id="footer-company-links">Company</h3>
@@ -58,11 +65,6 @@ import { siteConfig } from "../../config/site";
           <ul>
             <li><a href="/jobs/">Jobs</a></li>
             <li><a href="/brand-kit/">Brand Kit</a></li>
-            <li>
-              <a href="/soft-play-rental-agreement/"
-                >Soft Play Rental Agreement</a
-              >
-            </li>
           </ul>
         </nav>
       </div>
@@ -87,10 +89,7 @@ import { siteConfig } from "../../config/site";
       </div>
     </div>
     <small class="footnote footer-footnote"
-      >{siteConfig.name} © is a brand owned and operated by
-      <a href="https://www.clearancevault.com/" target="_blank"
-        ><span class="no-break">{siteConfig.legalName}</span></a
-      >
+      >{siteConfig.name} ©
       | <a class="no-break" href="/privacy-policy/">Privacy Policy</a>
       | <a href="/accessibility-statement/">Accessibility</a>
     </small>

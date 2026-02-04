@@ -85,7 +85,10 @@ switch (businessType) {
       ...baseSchema,
       legalName: siteConfig.legalName,
       ...(siteConfig.location.streetAddress && { address: addressSchema }),
-      founder: siteConfig.business.owner,
+      founder: {
+        "@type": siteConfig.business.owner.type,
+        name: siteConfig.business.owner.name,
+      },
     };
     break;
 
