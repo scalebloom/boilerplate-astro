@@ -1,0 +1,43 @@
+---
+import { Image } from "astro:assets";
+
+interface Props {
+  image: ImageMetadata;
+  alt: string;
+}
+
+const { image, alt } = Astro.props;
+---
+
+<div class="stacking-card">
+  <div class="stacking-card-inner-wrapper">
+    <!--Content slot -->
+    <div>
+      <slot />
+    </div>
+    <!-- Image -->
+    <Image
+      src={image}
+      alt={alt}
+      width={643}
+      height={400}
+      class="squircle-m"
+    />
+  </div>
+</div>
+
+<style>
+  .stacking-card {
+    margin-top: 2rem;
+  }
+  .stacking-card-inner-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+    gap: clamp(1.5rem, -2rem + 8.5vw, 6rem);
+    background-color: var(--clr-base);
+    border: 1px solid var(--clr-base-3);
+    border-radius: var(--squircle-m);
+    corner-shape: var(--corner-shape-squircle);
+    padding: clamp(2rem, 1.286rem + 1.905vw, 3rem);
+  }
+</style>

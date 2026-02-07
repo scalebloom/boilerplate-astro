@@ -1,0 +1,44 @@
+/* Notification System Styles */
+
+.notification-container {
+    position: fixed; inset: auto 2rem 2rem auto;
+    max-width: 24rem;
+    display:flex;flex-direction:column;gap:.75rem; /*Stacking notifications*/
+    pointer-events: none; /*CRITICAL: Allow touches to pass through empty areas */
+}
+
+@media (max-width: 767px) {
+  .notification-container {   
+    top: .75rem; right: .75rem; left: .75rem;
+    max-width: none;
+}}
+  
+.notification {
+    border-radius: .5rem;
+    padding: .375rem 1rem;
+    display: flex; align-items: center; gap: .5rem;
+    opacity: 0; transform: translateX(100%); transition: all 0.3s ease;
+    border-width: 2px; border-style: solid;
+    pointer-events: auto; /* CRITICAL: Re-enable interactions on actual notifications */
+}
+  
+.notification-visible { opacity: 1; transform: translateX(0); }
+.notification-dismissing { opacity: 0; transform: translateX(100%); }
+.notification-dismiss{ background:none;border:none;font-size:1.75rem;}
+
+/* Success */
+.notification-success, .notification-success button {
+  border-color: var(--clr-success-contrast);}
+  
+/* Error */
+.notification-error, .notification-error button {
+  border-color: var(--clr-danger-base);}
+  
+/* Warning */
+.notification-warning, .notification-warning button {
+  border-color: canvas;}
+  
+/* Info */
+.notification-info, .notification-info button {
+  border-color: var(--clr-contrast);}
+  

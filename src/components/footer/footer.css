@@ -1,26 +1,45 @@
-footer {padding: 4rem 1.25rem 1.5rem 1.25rem;font-size: 1.06rem;}
-.footer-inner-container {max-width: 80rem; margin: auto;}
-.footer-cols {display: flex;flex-wrap: wrap;gap: 2rem; justify-content: space-between;}
-/*First column with the logo and nav links*/
-.footer-col:first-child {
-  display: flex; flex-direction: column; gap: 2rem;
-  justify-content: space-between;}
-.footer-logo-link-wrapper .site-logo {
+footer {
+  padding: 4rem 1.25rem 1.5rem 1.25rem;font-size: 1.06rem;
+
+  .footer-inner-container {max-width: 80rem; margin: auto;}
+
+  .footer-cols {display:flex;flex-wrap:wrap;gap:2rem;justify-content:space-between;}
+
+  /*First column with the logo and nav links*/
+  .footer-col:first-child {
+    display: flex; flex-direction: column; gap: 2rem;
+    justify-content: space-between;
+  }
+
+  .footer-logo-link-wrapper .site-logo {
     width: 32rem;
-    max-width: 100%;}
-/*Footer social media links*/
-.footer-social-media-icon-links {display:flex;flex-wrap: wrap;gap: 1.25rem;}
-.footer-social-media-icon {width:1.25rem;height:1.25rem;color:var(--clr-contrast-3);}
-/*Footer navigation lists*/
-footer ul {
-  padding:0!important;list-style:none;
-  display:flex;flex-direction: column; gap:.5rem;}
-footer li a, footer address a {color:var(--clr-contrast-3)!important;text-decoration: none;}
-footer li a:hover, footer address a:hover {color:var(--clr-accent-1)!important;}
-/*Footer address*/
-footer address {
-  display:flex;flex-direction: column; gap:.5rem;
-  font-style: normal; color:var(--clr-contrast-3)}
-/*Footer small text*/
-.footer-footnote {margin-top: 2rem;display: block;}
-.footer-footnote a {color:inherit}
+    max-width: 100%;
+  }
+
+  /*Social media links*/
+  .footer-social-media-icon-links {display:flex;flex-wrap: wrap;gap: 1.25rem;}
+  .footer-social-media-icon {width:1.25rem;height:1.25rem;color:var(--clr-contrast-3);}
+
+  /*Navigation lists*/
+  ul {
+    padding:0!important;list-style:none;
+    display:flex;flex-direction: column; gap:.5rem;
+  }
+
+  li a, address a {
+    color:var(--clr-contrast-3)!important;text-decoration: none;
+    &:hover {color:var(--clr-accent-1)!important;}
+  }
+
+  /*Address*/
+  address {
+    display:flex;flex-direction: column; gap:.5rem;
+    font-style: normal; color:var(--clr-contrast-3);
+  }
+
+  /*Footnote*/
+  .footer-footnote {
+    margin-top: 2rem;display: block;
+    a {color:inherit;}
+  }
+}

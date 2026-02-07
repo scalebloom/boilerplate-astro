@@ -25,31 +25,116 @@ import Logo from "../logo.astro";
         aria-label="Toggle navigation menu"
         aria-expanded="false"
       >
-        <span class="nav-toggle-icon">
+        <span class="nav-toggle-icon" aria-hidden="true">
           <span class="nav-toggle-bar"></span>
           <span class="nav-toggle-bar"></span>
         </span>
-        <span class="sr-only">Toggle navigation menu</span>
       </button>
       <!-- Nav -->
-      <nav id="header-nav" popover role="navigation">
+      <nav id="header-nav" popover>
         <ul class="nav-list">
           <li class="nav-list-item">
             <a href="/" class="nav-link">Home</a>
           </li>
-          <li class="nav-list-item">
-            <a href="/about/" class="nav-link">About</a>
+          <li class="nav-list-item has-submenu">
+            <details>
+              <summary class="nav-link">
+                About
+                <svg aria-hidden="true"
+                  ><use href="/sprite.svg#icon-arrow-down"></use></svg
+                >
+              </summary>
+              <ul class="sub-nav-list">
+                <li>
+                  <a href="#" class="sub-nav-link">
+                    <svg class="sub-nav-link-icon" aria-hidden="true"
+                      ><use href="/sprite.svg#icon-groups"></use></svg
+                    >
+                    <span class="sub-nav-texts-col"
+                      ><span class="sub-nav-title">Sub nav link</span>
+                      <span class="sub-nav-description"
+                        >Sub nav description</span
+                      ></span
+                    >
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="sub-nav-link">
+                    <svg class="sub-nav-link-icon" aria-hidden="true"
+                      ><use href="/sprite.svg#icon-groups"></use></svg
+                    >
+                    <span class="sub-nav-texts-col"
+                      ><span class="sub-nav-title">Sub nav link</span>
+                      <span class="sub-nav-description"
+                        >Sub nav description</span
+                      ></span
+                    >
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="sub-nav-link">
+                    <svg class="sub-nav-link-icon" aria-hidden="true"
+                      ><use href="/sprite.svg#icon-groups"></use></svg
+                    >
+                    <span class="sub-nav-texts-col"
+                      ><span class="sub-nav-title">Sub nav link</span>
+                      <span class="sub-nav-description"
+                        >Sub nav description</span
+                      ></span
+                    >
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="sub-nav-link">
+                    <svg class="sub-nav-link-icon" aria-hidden="true"
+                      ><use href="/sprite.svg#icon-groups"></use></svg
+                    >
+                    <span class="sub-nav-texts-col"
+                      ><span class="sub-nav-title">Sub nav link</span>
+                      <span class="sub-nav-description"
+                        >Sub nav description</span
+                      ></span
+                    >
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="sub-nav-link">
+                    <svg class="sub-nav-link-icon" aria-hidden="true"
+                      ><use href="/sprite.svg#icon-groups"></use></svg
+                    >
+                    <span class="sub-nav-texts-col"
+                      ><span class="sub-nav-title">Sub nav link</span>
+                      <span class="sub-nav-description"
+                        >Sub nav description</span
+                      ></span
+                    >
+                  </a>
+                </li>
+              </ul>
+            </details>
           </li>
           <li class="nav-list-item">
-            <a href="/contact/" class="nav-link">Contact</a>
+            <a href="/#services/" class="nav-link">Services</a>
+          </li>
+          <li class="nav-list-item">
+            <a href="/careers/" class="nav-link">Careers</a>
           </li>
         </ul>
+        <a href="/contact/" class="nav-link-cta-primary">Get in touch</a>
+        <button id="theme-toggle" type="button" aria-label="Toggle theme">
+          <svg><use href="/sprite.svg#icon-dark-mode"></use></svg>
+        </button>
       </nav>
     </div>
   </div>
 </header>
 
 <script>
+  import { initializeThemeToggle } from "../theme-toggle.js";
+
+  // Initialize theme toggle
+  initializeThemeToggle();
+
   // Set aria-expanded for accessibility (screen readers)
   // Note: The hamburger animation is handled purely by CSS using :has() and :popover-open
   // This script only manages the aria-expanded attribute for assistive technologies
@@ -64,4 +149,23 @@ import Logo from "../logo.astro";
       );
     });
   }
+
+  // Close submenus when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!document.querySelector("#header-nav details[open]")) return;
+    const target = e.target as HTMLElement;
+    if (!target.closest("details")) {
+      document.querySelectorAll("#header-nav details[open]").forEach((d) => {
+        d.removeAttribute("open");
+      });
+    }
+  });
+
+  // Close submenus on Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    document.querySelectorAll("#header-nav details[open]").forEach((d) => {
+      d.removeAttribute("open");
+    });
+  });
 </script>

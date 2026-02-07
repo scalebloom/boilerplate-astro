@@ -1,0 +1,30 @@
+/* Squircle */
+:root {
+  --corner-shape-squircle: initial;
+  --squircle-s: .75rem;
+  --squircle-m: 1.5rem;
+  --squircle-l: 2rem;
+}
+
+@supports (corner-shape: squircle) {
+  :root {
+    --corner-shape-squircle: squircle;
+    --squircle-s: 1rem;
+    --squircle-m: 2rem;
+    --squircle-l: 3rem;
+  }
+}
+
+/* Squircle utility classes */
+.squircle-s {
+  border-radius: var(--squircle-s);
+  corner-shape: var(--corner-shape-squircle);
+}
+.squircle-m {
+  border-radius: var(--squircle-m);
+  corner-shape: var(--corner-shape-squircle);
+}
+.squircle-l {
+  border-radius: var(--squircle-l);
+  corner-shape: var(--corner-shape-squircle);
+}

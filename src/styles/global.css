@@ -1,5 +1,6 @@
 @import './cta-button.css';
 @import './details.css';
+@import './squircle.css';
 
 /* root holds theme state. 
 The triggers below update this state.*/
@@ -36,6 +37,12 @@ body {
   --clr-success-contrast: hwb(89 0% 58%);
   --clr-danger-base:      hwb(329 90% 0%);
   --clr-danger-contrast:  hwb(329 0% 28%);
+  --gradient-base: 
+    linear-gradient(
+      135deg, var(--clr-accent-2), color-mix(in srgb, var(--clr-accent-2), var(--clr-base) 20%));
+  --gradient-contrast: 
+    linear-gradient(
+      135deg, color-mix(in srgb, var(--clr-accent-1), var(--clr-contrast) 25%), var(--clr-accent-1));
   --shadow-natural: 0 .5rem 1rem rgba(0, 0, 0, 0.07);
   --shadow-neomorphism: .75rem .75rem 1rem 0 rgba(0,0,0,0.05), 
                     -.5rem -.5rem .75rem 0 rgba(255,255,255,0.5);
@@ -56,8 +63,8 @@ body {
     --clr-danger-base:      hwb(329 0% 58%);
     --clr-danger-contrast:  hwb(330 90% 0%);
     --shadow-natural: 0 .5rem 1rem rgba(0, 0, 0, 0.07);
-    --shadow-neomorphism: .75rem .75rem 1rem 0 rgba(0,0,0,0.05), 
-                    -.5rem -.5rem .75rem 0 rgba(255,255,255,0.5);
+    --shadow-neomorphism: 0 0 0 1px var(--clr-base-3);
+    img {filter: brightness(0.9) contrast(1.1);}
   }
   @container style(--theme-mode: 'coffee') {
     color-scheme: light;
@@ -66,11 +73,11 @@ body {
 }
 
 /* Theme transition */
-body,button,img,select,input,option,textarea,span,path {
+header,body,button,img,select,input,option,textarea,span,path {
   transition:
-    background-color .75s ease,
-    border-color .75s ease,
-    fill .75s ease;}
+    background-color .5s ease,
+    border-color .5s ease,
+    fill .5s ease;}
 
 /*Root variables*/    
 :root {
@@ -78,10 +85,7 @@ body,button,img,select,input,option,textarea,span,path {
   /*min 601 (smallest tablet), max 1440*/
   /*browserstack.com/guide/common-screen-resolutions*/
   --font-size--small: 0.875rem; /*14px Footnotes*/
-  --font-size--medium: clamp(
-                      .875rem, 
-                      0.785rem + 0.238vw, 
-                      1rem); /*16px Paragraphs*/
+  --font-size--medium: 1rem;
   --font-size--large: clamp( /*h3*/
                       1.25rem, 
                       1rem + 0.5vw, 
@@ -96,21 +100,6 @@ body,button,img,select,input,option,textarea,span,path {
                       4rem);
   /*Header height*/
   --header-height: 86px; /* Default for desktop */
-  /* Squircle */
-  --corner-shape-squircle: initial;
-  --squircle-s: .75rem;
-  --squircle-m: 1.5rem;
-  --squircle-l: 2rem;
-}
-
-/* Squircle */
-@supports (corner-shape: squircle) {
-  :root {
-    --corner-shape-squircle: squircle;
-    --squircle-s: 1rem;
-    --squircle-m: 2rem;
-    --squircle-l: 3rem;
-  }
 }
 
 /*Root variables - Small screens*/   
@@ -132,6 +121,7 @@ body{min-height:100vh;background-color:var(--clr-base);}
 body:has(dialog[open]){overflow:hidden;}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}
+.no-break{white-space:nowrap;}
 svg{display:block;}/*otherwise they default inline-block, creating unintented gaps*/
 img{max-width:100%;height:auto}
 /*Text selection*/
@@ -241,6 +231,10 @@ th, td {
   text-align: left;
   padding: .375rem 0.5rem; border: 1px solid var(--clr-base-3);
 }
+/*Sections and section inner containers*/
+section {padding: clamp(3rem, 0.5rem + 6.667vw, 6.5rem) 1.25rem;position: relative;
+  > div, > ul {max-width: 88rem;margin-inline: auto;}
+}
 
 /*****************************
 Custom Components
@@ -261,21 +255,19 @@ a.link-expand::before {content:'';position:absolute;inset:0;z-index:1;}
 /*Typography*/
 .eyebrow {
   display:block;margin-bottom:1.5rem;
-  font-size:1rem;text-transform:uppercase;letter-spacing:1px;
-  color:var(--clr-accent-1);}
-.eyebrow:after {
-  content:'';
-  background-repeat:no-repeat;background-position:center;background-size:100%;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23004aac' stroke='%23004aac' width='47.625' height='16.5' viewBox='-18.837 -6.179 47.625 16.5'%3E%3Cpath class='stroke arrow-line' fill='none' stroke-width='.4' stroke-miterlimit='10' d='M-17.087-5.491h40.858v8.756' style='stroke-dashoffset: 0; stroke-dasharray: none;'%3E%3C/path%3E%3Cpath class='arrow arrow-triangle' d='M27.913 2.052l-4.142 7.182-4.148-7.182h8.29z' style='opacity: 1;'%3E%3C/path%3E%3C/svg%3E");
-  position:absolute;
-  padding:1em 2em;
-  margin-left:.5rem;
+  font-size:var(--font-size--medium);
+  text-transform:uppercase;letter-spacing:1px;
+  color:var(--clr-accent-1);
+  &:before {
+    content:'';
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px'%3E%3Cpath d='m397-115-99-184-184-99 71-70 145 25 102-102-317-135 84-86 385 68 124-124q23-23 57-23t57 23q23 23 23 56.5T822-709L697-584l68 384-85 85-136-317-102 102 26 144-71 71Z'/%3E%3C/svg%3E");
+    mask-repeat: no-repeat; mask-position: center; mask-size: 100%;
+    background-color: currentColor;
+    padding:.75rem;
+    margin-inline-end:.5rem;
+  }
 }
-.eyebrow-light{color:var(--clr-accent-2);}
-.eyebrow-light:after {
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23FCA735' stroke='%23FCA735' width='47.625' height='16.5' viewBox='-18.837 -6.179 47.625 16.5'%3E%3Cpath class='stroke arrow-line' fill='none' stroke-width='.4' stroke-miterlimit='10' d='M-17.087-5.491h40.858v8.756' style='stroke-dashoffset: 0; stroke-dasharray: none;'%3E%3C/path%3E%3Cpath class='arrow arrow-triangle' d='M27.913 2.052l-4.142 7.182-4.148-7.182h8.29z' style='opacity: 1;'%3E%3C/path%3E%3C/svg%3E");
-}
-.subheading {font-size: var(--font-size--large);text-wrap:balance;}
+.subheading {font-size: var(--font-size--large);text-wrap:pretty;}
 .footnote, small {font-size: var(--font-size--small);color:var(--clr-contrast-3)}
 
 /*Lists*/
@@ -293,4 +285,14 @@ a.link-expand::before {content:'';position:absolute;inset:0;z-index:1;}
   content: "";display:block;
   height:1px;background-color:var(--clr-base-3);
   margin-top:.75rem;margin-bottom:.75rem;
+}
+
+.bg-dots{
+  background-image:radial-gradient(color-mix(in srgb,var(--clr-accent-1) 40%,var(--clr-base)) 1px,transparent 0);
+  background-position:-1rem -1rem;background-size:1.5rem 1.5rem;position:relative;
+  &:after {
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(to bottom,var(--clr-base) 0%,transparent 50%,var(--clr-base) 100%)
+  }
+  > div, > ul {position:relative;z-index: 1;}
 }

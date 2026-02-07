@@ -1,0 +1,142 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { Image } from "astro:assets";
+import StackingImg1 from "../assets/gallery/unprocessed (7).JPG";
+---
+
+<Layout title="" description="">
+  <section>
+    <div>
+      <!--Stacking card -->
+      <div class="stacking-card">
+        <div class="stacking-card-inner-wrapper">
+          <!--Col 1 -->
+          <div><p>Text here</p></div>
+          <!-- Image -->
+          <image
+            src="{StackingImg1}"
+            alt=""
+            width="{643}"
+            height="{400}"
+            class="squircle-m"
+          />
+        </div>
+      </div>
+      <!--Stacking card -->
+      <div class="stacking-card">
+        <div class="stacking-card-inner-wrapper">
+          <!--Col 1 -->
+          <div><p>Text here</p></div>
+          <!-- Image -->
+          <image
+            src="{StackingImg1}"
+            alt=""
+            width="{643}"
+            height="{400}"
+            class="squircle-m"
+          />
+        </div>
+      </div>
+      <!--Stacking card -->
+      <div class="stacking-card">
+        <div class="stacking-card-inner-wrapper">
+          <!--Col 1 -->
+          <div><p>Text here</p></div>
+          <!-- Image -->
+          <image
+            src="{StackingImg1}"
+            alt=""
+            width="{643}"
+            height="{400}"
+            class="squircle-m"
+          />
+        </div>
+      </div>
+    </div>
+    <script is:inline>
+      document.addEventListener("DOMContentLoaded", () => {
+        const cards = document.querySelectorAll(".stacking-card");
+
+        cards.forEach((card, index) => {
+          card.style.position = "sticky";
+          card.style.top = `calc(var(--header-height) + clamp(2rem, 3vw, 3.5rem) + ${index} * clamp(0.5rem, 1vw, 1rem))`;
+          card.style.transition = "transform 0.3s ease-out";
+          card.style.transformOrigin = "top center";
+        });
+
+        const updateCardScales = () => {
+          cards.forEach((card, index) => {
+            const cardRect = card.getBoundingClientRect();
+            const cardTop = parseFloat(getComputedStyle(card).top);
+
+            // Calculate if this card has reached its sticky position
+            const hasReachedTop = cardRect.top <= cardTop;
+
+            if (!hasReachedTop) {
+              // Card hasn't reached the top yet, full scale
+              card.style.transform = "scale(1)";
+              return;
+            }
+
+            // Check if the next card is approaching
+            if (index < cards.length - 1) {
+              const nextCard = cards[index + 1];
+              const nextCardRect = nextCard.getBoundingClientRect();
+              const nextCardTop = parseFloat(getComputedStyle(nextCard).top);
+
+              // Calculate how close the next card is to its sticky position
+              const distanceUntilNextSticks = nextCardRect.top - nextCardTop;
+
+              // Start scaling when next card is within a certain distance
+              // Make scale range responsive: smaller on mobile, larger on desktop
+              const scaleRange = window.innerWidth < 768 ? 200 : 500;
+
+              // Calculate final scale for this card based on its index
+              // Earlier cards scale down more (further away), later cards scale down less (closer to user)
+              const scaleDecrement = 0.03; // Amount to scale down per card
+              const cardsFromEnd = cards.length - 1 - index; // How many cards are after this one
+              const minScale = 1 - scaleDecrement * (cardsFromEnd + 1);
+
+              if (distanceUntilNextSticks <= scaleRange) {
+                // Scale from 1.0 down to minScale as next card approaches
+                const progress = Math.max(
+                  0,
+                  distanceUntilNextSticks / scaleRange,
+                );
+                const scale = minScale + progress * (1 - minScale);
+                card.style.transform = `scale(${scale})`;
+              } else {
+                // Next card is far away, keep at full scale
+                card.style.transform = "scale(1)";
+              }
+            } else {
+              // Last card, no need to scale down
+              card.style.transform = "scale(1)";
+            }
+          });
+        };
+
+        // Update on scroll
+        window.addEventListener("scroll", updateCardScales, { passive: true });
+
+        // Initial update
+        updateCardScales();
+      });
+    </script>
+    <style>
+      .stacking-card {
+        margin-top: 2rem;
+      }
+      .stacking-card-inner-wrapper {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+        gap: clamp(1.5rem, -2rem + 8.5vw, 6rem);
+        background-color: var(--clr-base);
+        border: 1px solid var(--clr-base-3);
+        border-radius: var(--squircle-m);
+        corner-shape: var(--corner-shape-squircle);
+        padding: clamp(2rem, 1.286rem + 1.905vw, 3rem);
+      }
+    </style>
+  </section>
+</Layout>

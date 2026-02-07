@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Infinite scrolling logos</title>
+    <style>
+      .scrollingLogos {
+        --scrollingLogos-item-width: clamp(8rem, 2.286rem + 15.238vw, 16rem);
+        --scrollingLogos-item-height: clamp(4rem, 1.143rem + 7.619vw, 8rem);
+        --scrollingLogos-base-speed: 2; /* Base speed in seconds per item - JS will calculate final duration */
+        display: flex;
+        block-size: var(--scrollingLogos-item-height);
+        position: relative;
+        overflow-x: hidden;
+        /*Make it full width*/
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+      }
+
+      .scrollingLogos figure {
+        --scrollingLogos-item-offset: max(
+          calc(var(--scrollingLogos-item-width) * var(--scrollingLogos-items)),
+          calc(100% + var(--scrollingLogos-item-width))
+        );
+        --scrollingLogos-delay: calc(
+          var(--scrollingLogos-duration) / var(--scrollingLogos-items) *
+            (var(--scrollingLogos-items) - var(--scrollingLogos-item-index)) * -1
+        );
+        position: absolute;
+        inset-inline-start: var(--scrollingLogos-item-offset);
+        transform: translateX(-50%);
+        animation: go linear var(--scrollingLogos-duration) var(--scrollingLogos-delay, 0s) infinite;
+        width: var(--scrollingLogos-item-width);
+        height: var(--scrollingLogos-item-height);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-inline: 1rem;
+        background: forestgreen; /*Just for testing*/
+      }
+
+      .scrollingLogos img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+
+      @keyframes go {
+        to {
+          inset-inline-start: calc(var(--scrollingLogos-item-width) * -1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <section style="padding: 6rem 1.5rem">
+      <div style="max-width: 1080px; margin-inline: auto">
+        <h1>Scrolling logos</h1>
+        <div class="scrollingLogos">
+          <figure><img src="https://placehold.co/300x300/?text=1" /></figure>
+          <figure><img src="https://placehold.co/600x240/?text=2" /></figure>
+          <figure><img src="https://placehold.co/240x540/?text=3" /></figure>
+          <figure><img src="https://placehold.co/360x300/?text=4" /></figure>
+          <figure><img src="https://placehold.co/540x450/?text=5" /></figure>
+          <figure><img src="https://placehold.co/150x480/?text=6" /></figure>
+          <figure><img src="https://placehold.co/660x240/?text=7" /></figure>
+          <figure><img src="https://placehold.co/570x225/?text=8" /></figure>
+        </div>
+      </div>
+    </section>
+    <script>
+      const scrollingLogos = document.querySelector(".scrollingLogos");
+      const figures = scrollingLogos.querySelectorAll("figure");
+      const baseSpeed = parseFloat(getComputedStyle(scrollingLogos).getPropertyValue("--scrollingLogos-base-speed"));
+
+      // Calculate duration that avoids fractional milliseconds
+      const itemCount = figures.length;
+      const baseDuration = baseSpeed * itemCount;
+      // Round to nearest 0.1 second to avoid fractional millisecond issues
+      const safeDuration = Math.round(baseDuration * 10) / 10;
+
+      scrollingLogos.style.setProperty("--scrollingLogos-items", itemCount);
+      scrollingLogos.style.setProperty("--scrollingLogos-duration", `${safeDuration}s`);
+
+      figures.forEach((figure, index) => {
+        figure.style.setProperty("--scrollingLogos-item-index", index + 1);
+      });
+    </script>
+  </body>
+</html>
