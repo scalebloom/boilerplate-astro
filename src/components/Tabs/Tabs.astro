@@ -1,0 +1,140 @@
+---
+/**
+ * Tabs Component
+ *
+ * DESIGN CONSTRAINTS & DECISIONS:
+ *
+ * 1. WHY STATIC NAMED SLOTS?
+ *    - Astro requires slot names to be static strings (no dynamic slot names like `name={`tab-${index}`}`)
+ *    - This is an Astro limitation, not our choice
+ *
+ * 2. WHY NOT INSPECT SLOT CONTENT?
+ *    - Astro can't read component props from slot children at build time
+ *    - This approach won't work:
+ *      <Tabs>
+ *        <TabPanel title="...">Content</TabPanel>
+ *      </Tabs>
+ *    - Because Tabs.astro has no way to extract the "title" from TabPanel during build
+ *
+ * 3. WHY DIFFERENT FROM STACKINGCARD?
+ *    - StackingCard components are independent - each card stands alone
+ *    - Tabs are interconnected - buttons must know about all panels upfront
+ *    - Tab buttons and panels are linked via IDs and ARIA attributes
+ *
+ * 4. WHY THE 10-TAB LIMIT?
+ *    - We must pre-define all possible slot names (tab-0 through tab-9)
+ *    - Increase the limit if needed - there's NO performance penalty for unused slots
+ *    - If you use 3 tabs, only 3 panels render (tabs.map handles this)
+ *
+ * 5. ALTERNATIVES CONSIDERED & REJECTED:
+ *    - HTML strings with set:html - Works but less maintainable, no syntax highlighting
+ *    - Single default slot - Can't separate content by tab
+ *    - Component-based approach - Blocked by Astro's build-time limitations
+ *
+ * USAGE:
+ * <Tabs tabs={[{title, icon}, ...]}>
+ *   <Fragment slot="tab-0"><h3>Content</h3></Fragment>
+ *   <Fragment slot="tab-1"><h3>Content</h3></Fragment>
+ * </Tabs>
+ *
+ * Props:
+ * - title (required): Tab button text
+ * - icon (optional): Icon ID from sprite.svg
+ * - hash (optional): URL hash for deep linking (auto-generated from title if not provided)
+ */
+
+import "./Tabs.css";
+import type { ComponentProps } from 'astro/types';
+
+interface Tab {
+  title: string;
+  icon?: string;
+  hash?: string;
+}
+
+interface Props {
+  tabs: Tab[];
+  ariaLabel?: string;
+}
+
+const { tabs, ariaLabel = "Content categories" } = Astro.props;
+
+// Auto-generate hash from title if not provided
+const tabsWithHash = tabs.map(tab => ({
+  ...tab,
+  hash: tab.hash || tab.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+}));
+---
+
+<div class="vertical-tabs" data-tabs>
+  <!-- Buttons wrapper -->
+  <div
+    class="tab-buttons-wrapper"
+    role="tablist"
+    aria-label={ariaLabel}
+  >
+    {tabsWithHash.map((tab, index) => (
+      <button
+        class="tab-button"
+        role="tab"
+        aria-selected={index === 0 ? "true" : "false"}
+        aria-controls={`tab-panel-${index}`}
+        id={`tab-${index}`}
+        data-tab-hash={tab.hash}
+      >
+        {tab.icon && (
+          <svg aria-hidden="true"><use href={`/sprite.svg#${tab.icon}`}></use></svg>
+        )}
+        {tab.title}
+      </button>
+    ))}
+  </div>
+
+  <!-- Tab content wrapper -->
+  <div class="tab-content-wrapper">
+    {tabsWithHash.map((_, index) => (
+      <div
+        class="tab-content"
+        role="tabpanel"
+        id={`tab-panel-${index}`}
+        aria-labelledby={`tab-${index}`}
+        hidden={index !== 0}
+      >
+        {index === 0 && <slot name="tab-0" />}
+        {index === 1 && <slot name="tab-1" />}
+        {index === 2 && <slot name="tab-2" />}
+        {index === 3 && <slot name="tab-3" />}
+        {index === 4 && <slot name="tab-4" />}
+        {index === 5 && <slot name="tab-5" />}
+        {index === 6 && <slot name="tab-6" />}
+        {index === 7 && <slot name="tab-7" />}
+        {index === 8 && <slot name="tab-8" />}
+        {index === 9 && <slot name="tab-9" />}
+      </div>
+    ))}
+  </div>
+</div>
+
+<script>
+  const tabsContainer = document.querySelector("[data-tabs]");
+  if (tabsContainer) {
+    let initialized = false;
+
+    const init = async () => {
+      if (initialized) return;
+      initialized = true;
+
+      const { initTabs } = await import("./Tabs.js");
+      initTabs();
+
+      // Re-initialize after view transitions (if using Astro view transitions)
+      document.addEventListener("astro:after-swap", () => {
+        initTabs();
+      });
+    };
+
+    // Initialize on first interaction (click or keyboard focus)
+    tabsContainer.addEventListener("click", init, { once: true });
+    tabsContainer.addEventListener("focusin", init, { once: true });
+  }
+</script>

@@ -1,0 +1,128 @@
+---
+import "../styles/forms.css";
+---
+
+<!-- Contact Form -->
+<form id="contact-form">
+  <fieldset>
+    <legend style="font-size: var(--font-size--large)">Send a message</legend>
+
+    <!-- Pooh bear field -->
+    <div class="sr-only" hidden aria-hidden="true">
+      <label for="website">Website</label>
+      <input
+        type="text"
+        id="website"
+        name="website"
+        tabindex="-1"
+        autocomplete="off"
+      />
+    </div>
+
+    <div>
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" required />
+    </div>
+
+    <div>
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required />
+    </div>
+
+    <div>
+      <label for="phone">Phone</label>
+      <input type="tel" id="phone" name="phone" required />
+    </div>
+
+    <div>
+      <label for="source">How did you find us?</label>
+      <input type="text" id="source" name="source" required />
+    </div>
+
+    <div>
+      <label for="message">Message</label>
+      <textarea id="message" name="message" rows="3"></textarea>
+    </div>
+
+    <button type="submit" class="cta-button" style="width:100%"
+      >Send Message</button
+    >
+  </fieldset>
+</form>
+
+<!-- Form status message -->
+<div id="form-status" style="display: none;margin: auto;">
+  <p id="status-message"></p>
+</div>
+
+<script>
+  // Spam prevention: Capture when form was loaded
+  const formLoadTime = Date.now();
+
+  // Handle form submission
+  document
+    .getElementById("contact-form")
+    ?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const form = e.target as HTMLFormElement;
+      const formData = new FormData(form);
+      const statusDiv = document.getElementById("form-status");
+      const statusMessage = document.getElementById("status-message");
+      const submitButton = form.querySelector(
+        'button[type="submit"]',
+      ) as HTMLButtonElement;
+
+      if (!statusDiv || !statusMessage || !submitButton) return;
+
+      // Show loading state
+      submitButton.disabled = true;
+      submitButton.textContent = "Sending...";
+      statusDiv.style.display = "none";
+
+      // Calculate time taken to fill form (in seconds)
+      const timeTaken = Math.floor((Date.now() - formLoadTime) / 1000);
+
+      try {
+        const data = {
+          name: formData.get("name"),
+          email: formData.get("email"),
+          phone: formData.get("phone"),
+          source: formData.get("source"),
+          message: formData.get("message"),
+          website: formData.get("website"),
+          "time-taken": timeTaken,
+          userAgent: navigator.userAgent,
+        };
+
+        const response = await fetch(
+          "/.netlify/functions/contact-form-handler",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          },
+        );
+
+        const result = await response.json();
+
+        if (response.ok) {
+          statusMessage.textContent = result.message;
+          statusDiv.className = "success";
+          form.style.display = "none";
+        } else {
+          statusMessage.textContent = result.error;
+          statusDiv.className = "error";
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        statusMessage.textContent = "Network error. Please try again.";
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Send Message";
+        statusDiv.style.display = "block";
+      }
+    });
+</script>

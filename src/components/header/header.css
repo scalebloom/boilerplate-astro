@@ -2,6 +2,11 @@ header{
   padding:.75rem 1.25rem;background-color:var(--clr-base);
   position:sticky/*otherwise relative*/;top:0;z-index:99;
 
+  &.scrolled {
+    background-color: color-mix(in srgb, var(--clr-base), transparent 15%);
+    backdrop-filter: blur(16px);
+  }
+
   .header-inner-container {
     max-width:104rem;margin:auto;
     display:flex;justify-content:space-between;align-items:center;gap:1rem;

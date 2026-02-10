@@ -1,0 +1,74 @@
+---
+import { Image } from "astro:assets";
+import FinalCTAImage1 from "../assets/gallery/unprocessed (17).jpg";
+import FinalCTAImage2 from "../assets/gallery/unprocessed (14).jpg";
+import FinalCTAImage3 from "../assets/gallery/unprocessed (8).jpg";
+---
+
+<section
+  style="padding-block: clamp(1.5rem, 0.25rem + 3.333vw, 3.25rem);overflow:clip"
+>
+  <!-- Colored container -->
+  <div
+    class="squircle-l"
+    style="background:var(--gradient-accent-2);
+  display: flex;flex-wrap: wrap;
+  align-items: center;"
+  >
+    <!-- Col 1 -->
+    <div
+      style="flex: 2 5 352px; 
+      padding: clamp(2rem,1.286rem + 1.905vw,3rem);text-wrap: balance;max-width: 48rem;"
+    >
+      <h2>
+        <div style="font-weight: 300;">Let's redefine your</div> ground-handling experience
+      </h2>
+      <p class="subheading">
+        Partner with us today to experience the NextGen difference
+      </p>
+      <a class="cta-button cta-button-hover-base" href="/contact/"
+        >Partner with us</a
+      >
+    </div>
+    <!-- Col 2 -->
+    <div
+      style="flex: 5 2 352px;min-width: 0;
+    display:grid; gap: .625rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    justify-items: flex-end;
+    margin-inline: -2rem;
+    padding-block-end:clamp(2rem,1.286rem + 1.905vw,3rem);"
+    >
+      <Image
+        src={FinalCTAImage1}
+        alt="Ground handling team servicing aircraft at airport"
+        width={272}
+        height={496}
+        style="margin-block-start: clamp(-3.25rem, 4.071rem + -11.19vw, -0.125rem);min-height: -webkit-fill-available;"
+        class="squircle-m"
+      />
+      <Image
+        src={FinalCTAImage2}
+        alt="Professional ground support equipment in operation"
+        width={272}
+        height={496}
+        style="margin-block-start: clamp(-3.25rem, 4.071rem + -11.19vw, -0.125rem);min-height: -webkit-fill-available;"
+        class="squircle-m"
+      />
+      <Image
+        src={FinalCTAImage3}
+        alt="Airport ground handling operations"
+        width={272}
+        height={496}
+        style="margin-block-start: clamp(-3.25rem, 4.071rem + -11.19vw, -0.125rem);min-height: -webkit-fill-available;"
+        class="squircle-m"
+      />
+    </div>
+  </div>
+  <!-- Dark BG divider -->
+  <div
+    class="dark-theme"
+    style=" background: var(--clr-base-2);width: 100%;max-width: 100%;height: 50%;position: absolute;inset: auto 0 0 0;z-index: -1;corner-shape: var(--corner-shape-squircle);border-radius: clamp(1.875rem, -2.5rem + 11.667vw, 8rem) clamp(1.875rem, -2.5rem + 11.667vw, 8rem) 0 0;"
+  >
+  </div>
+</section>

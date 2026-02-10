@@ -1,4 +1,3 @@
-// src/js/core/theme-toggle.js
 export function initializeThemeToggle() {
   const themeToggle = document.querySelector("#theme-toggle");
   const root = document.documentElement;
@@ -9,7 +8,9 @@ export function initializeThemeToggle() {
     if (storedTheme) {
       return storedTheme;
     }
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
   };
 
   // Function to update theme

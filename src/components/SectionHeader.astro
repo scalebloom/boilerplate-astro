@@ -1,0 +1,28 @@
+---
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  headingThin1?: string;
+  headingThin2?: string;
+  subheading: string;
+}
+
+const { heading, subheading, eyebrow, headingThin1, headingThin2 } =
+  Astro.props;
+---
+
+<div
+  style="display: grid;align-items: end;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+    gap: clamp(1rem, -2.571rem + 9.524vw, 6rem);margin-block-end: clamp(2.5rem, 1.429rem + 2.857vw, 4rem);"
+>
+  <h2 style="margin-block-end:0">
+    {eyebrow && <span class="eyebrow">{eyebrow} </span>}
+    {headingThin1 && <div style="font-weight: 100;">{headingThin1}</div>}
+    {heading}
+    {headingThin2 && <div style="font-weight: 100;">{headingThin2}</div>}
+  </h2>
+  <p class="subheading">
+    {subheading}
+  </p>
+</div>

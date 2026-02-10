@@ -138,17 +138,16 @@ import Logo from "../logo.astro";
   // Set aria-expanded for accessibility (screen readers)
   // Note: The hamburger animation is handled purely by CSS using :has() and :popover-open
   // This script only manages the aria-expanded attribute for assistive technologies
-  const navToggle = document.querySelector('[popovertarget="header-nav"]');
-  const nav = document.getElementById("header-nav");
+  const navToggle = document.querySelector('[popovertarget="header-nav"]')!;
+  const nav = document.getElementById("header-nav")!;
+  const header = document.querySelector("header")!;
 
-  if (navToggle && nav) {
-    nav.addEventListener("toggle", (e) => {
-      navToggle.setAttribute(
-        "aria-expanded",
-        String((e as ToggleEvent).newState === "open"),
-      );
-    });
-  }
+  nav.addEventListener("toggle", (e) => {
+    navToggle.setAttribute(
+      "aria-expanded",
+      String((e as ToggleEvent).newState === "open"),
+    );
+  });
 
   // Close submenus when clicking outside
   document.addEventListener("click", (e) => {
@@ -167,5 +166,10 @@ import Logo from "../logo.astro";
     document.querySelectorAll("#header-nav details[open]").forEach((d) => {
       d.removeAttribute("open");
     });
+  });
+
+  // Add scrolled class to header when scrolling
+  window.addEventListener("scroll", () => {
+    header.classList.toggle("scrolled", window.scrollY > 50);
   });
 </script>
