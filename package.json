@@ -11,8 +11,7 @@
   "dependencies": {
     "@astrojs/mdx": "^4.3.13",
     "@astrojs/sitemap": "^3.7.0",
-    "astro": "^5.17.1",
-    "astro-critical-css": "^0.0.7"
+    "astro": "^5.17.1"
   },
   "devDependencies": {
     "prettier": "^3.8.1",
