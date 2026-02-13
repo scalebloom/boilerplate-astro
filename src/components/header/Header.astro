@@ -20,8 +20,7 @@ import Logo from "../logo.astro";
       <!-- Nav Toggle Button-->
       <button
         type="button"
-        popovertarget="header-nav"
-        class="nav-toggle"
+        id="nav-toggle"
         aria-label="Toggle navigation menu"
         aria-expanded="false"
       >
@@ -31,7 +30,7 @@ import Logo from "../logo.astro";
         </span>
       </button>
       <!-- Nav -->
-      <nav id="header-nav" popover>
+      <nav id="header-nav">
         <ul class="nav-list">
           <li class="nav-list-item">
             <a href="/" class="nav-link">Home</a>
@@ -135,41 +134,57 @@ import Logo from "../logo.astro";
   // Initialize theme toggle
   initializeThemeToggle();
 
-  // Set aria-expanded for accessibility (screen readers)
-  // Note: The hamburger animation is handled purely by CSS using :has() and :popover-open
-  // This script only manages the aria-expanded attribute for assistive technologies
-  const navToggle = document.querySelector('[popovertarget="header-nav"]')!;
+  const navToggle = document.getElementById("nav-toggle")!;
   const nav = document.getElementById("header-nav")!;
   const header = document.querySelector("header")!;
 
-  nav.addEventListener("toggle", (e) => {
-    navToggle.setAttribute(
-      "aria-expanded",
-      String((e as ToggleEvent).newState === "open"),
-    );
-  });
+  // Helper to close mobile nav
+  const closeNav = () => {
+    nav.classList.remove("nav-open");
+    navToggle.setAttribute("aria-expanded", "false");
+  };
 
-  // Close submenus when clicking outside
-  document.addEventListener("click", (e) => {
-    if (!document.querySelector("#header-nav details[open]")) return;
-    const target = e.target as HTMLElement;
-    if (!target.closest("details")) {
-      document.querySelectorAll("#header-nav details[open]").forEach((d) => {
-        d.removeAttribute("open");
-      });
-    }
-  });
-
-  // Close submenus on Escape key
-  document.addEventListener("keydown", (e) => {
-    if (e.key !== "Escape") return;
-    document.querySelectorAll("#header-nav details[open]").forEach((d) => {
+  // Helper to close all open submenus
+  const closeSubmenus = () => {
+    nav.querySelectorAll("details[open]").forEach((d) => {
       d.removeAttribute("open");
     });
+  };
+
+  // Toggle mobile nav on button click
+  navToggle.addEventListener("click", () => {
+    const isOpen = nav.classList.toggle("nav-open");
+    navToggle.setAttribute("aria-expanded", String(isOpen));
+  });
+
+  // Close nav and submenus when clicking outside
+  document.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    if (target.closest("#nav-toggle")) return;
+
+    const clickedInNav = target.closest("#header-nav");
+    if (!clickedInNav && nav.classList.contains("nav-open")) closeNav();
+    if (!target.closest("details")) closeSubmenus();
+  });
+
+  // Close nav and submenus on Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    closeNav();
+    closeSubmenus();
   });
 
   // Add scrolled class to header when scrolling
-  window.addEventListener("scroll", () => {
-    header.classList.toggle("scrolled", window.scrollY > 50);
-  });
+  let isScrolled = false;
+  window.addEventListener(
+    "scroll",
+    () => {
+      const shouldBeScrolled = window.scrollY > 50;
+      if (isScrolled !== shouldBeScrolled) {
+        isScrolled = shouldBeScrolled;
+        header.classList.toggle("scrolled", isScrolled);
+      }
+    },
+    { passive: true },
+  );
 </script>

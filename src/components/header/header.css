@@ -5,6 +5,7 @@ header{
   &.scrolled {
     background-color: color-mix(in srgb, var(--clr-base), transparent 15%);
     backdrop-filter: blur(16px);
+    box-shadow: var(--shadow-natural);
   }
 
   .header-inner-container {
@@ -17,14 +18,14 @@ header{
 .header-col-2 {display: flex;}
 
 /*Header nav-toggle button*/
-.nav-toggle{
+#nav-toggle{
   display:flex;background:none;border:none;
   position:relative;z-index:999;
   padding: .5rem;
   border-radius: var(--squircle-m);
   corner-shape: var(--corner-shape-squircle);
 
-  &:hover, &:has(~ #header-nav:popover-open) {background-color: var(--clr-base-2);}
+  &:hover, &:has(~ #header-nav.nav-open) {background-color: var(--clr-base-2);}
   &:focus-visible {outline: 1px solid var(--clr-contrast-3);}
 
   /*Hamburger icon*/
@@ -39,12 +40,12 @@ header{
     }
   }
 
-  &:has(~ #header-nav:popover-open) .nav-toggle-bar {
+  &:has(~ #header-nav.nav-open) .nav-toggle-bar {
     &:first-child { transform:translateY(7px) rotate(45deg); }
     &:last-child { transform:translateY(-7px) rotate(-45deg); }
   }
 
-  @media (min-width: 768px) {display: none;}
+  @media (min-width: 921px) {display: none;}
 }
 
 /*Header nav*/
@@ -55,9 +56,9 @@ header{
   -webkit-overflow-scrolling:touch;
   display: flex; flex-direction: column; gap: 1.5rem;
   /*Position*/
-  width: 100%;
-  top: anchor(bottom); margin-block-start: .75rem;
-  right: anchor(right);
+  position: fixed;
+  top: var(--header-height);
+  left: 0; right: 0;
   /*Styling*/
   background-color: color-mix(in srgb, var(--clr-base), canvas 70%);
   border: none;
@@ -65,31 +66,33 @@ header{
   padding:1.5rem 2rem;
   border-radius: 0 0 var(--squircle-l) var(--squircle-l);
   corner-shape: var(--corner-shape-squircle);
-  /*Animation*/
+  /*Animation & visibility*/
+  visibility: hidden;
+  pointer-events: none;
   opacity: 0;
   transform: translateY(-.5rem);
   transition:
     opacity .2s ease-out,
     transform .2s ease-out,
-    display .2s allow-discrete;
+    visibility .2s;
 
-  &:popover-open {
+  &.nav-open {
+    visibility: visible;
+    pointer-events: auto;
     opacity: 1;
     transform: translateY(0);
-    @starting-style {
-      opacity: 0;
-      transform: translateY(-.5rem);
-    }
   }
 
-    @media (min-width: 768px) {
-      position: static;
-      flex-direction: row; align-items: center;
-      margin: 0; padding: 0;
-      box-shadow: none; background: transparent;
-      overflow: visible; /*Allows hover underline to show*/
-      opacity: 1; transform: none; transition: none;
-    }
+  @media (min-width: 921px) {
+    position: static;
+    flex-direction: row; align-items: center;
+    margin: 0; padding: 0;
+    box-shadow: none; background: transparent;
+    overflow: visible; /*Allows hover underline to show*/
+    visibility: visible;
+    pointer-events: auto;
+    opacity: 1; transform: none; transition: none;
+  }
 
   .nav-list {
     list-style:none;margin:0;padding:0;
@@ -101,16 +104,20 @@ header{
         position:relative;line-height:normal;
       }
       .nav-list-item {
-        &::after {
-          content:"";position:absolute;width:100%;
-          bottom:-.25rem;height:2px;
-          background-color:var(--clr-accent-1);
-          transform:scaleX(0);
-          transform-origin:100% 50%;
-          transition:transform .25s cubic-bezier(.215,.61,.355,1);
+        width: 100%;
+        /*Underline effect (hover-capable devices only)*/
+        @media (hover: hover) {
+          &::after {
+            content:"";position:absolute;width:100%;
+            bottom:-.25rem;height:2px;
+            background-color:var(--clr-accent-1);
+            transform:scaleX(0);
+            transform-origin:100% 50%;
+            transition:transform .25s cubic-bezier(.215,.61,.355,1);
+          }
+          &:hover:not(:has(details[open]))::after {
+            transform:scaleX(1);transform-origin:0 50%;}
         }
-        &:hover:not(:has(details[open]))::after {
-          transform:scaleX(1);transform-origin:0 50%;}
       }
 
       .nav-link, .sub-nav-link {
@@ -121,6 +128,7 @@ header{
       .has-submenu summary {
         cursor: pointer;
         display: flex; gap: .375rem; align-items: center;
+        width: 100%;
         &:focus-visible { outline: 1px solid var(--clr-contrast-3); outline-offset: 2px; }
         svg { width:1rem; height:1rem; margin-right:-.125rem; transition: transform .2s; }
       }
