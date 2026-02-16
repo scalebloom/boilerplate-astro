@@ -1,6 +1,6 @@
 ---
 import { Image, getImage } from "astro:assets";
-import "./carousel.css";
+import "./image-carousel.css";
 
 interface Props {
   images: ImageMetadata[];
@@ -33,7 +33,7 @@ const otherImagesData = await Promise.all(
 );
 ---
 
-<div class="product-carousel lightbox-gallery" id={carouselId} data-image-count={images.length}>
+<div class="image-carousel lightbox-gallery" id={carouselId} data-image-count={images.length}>
   <div class="carousel-images">
     <!-- Visible carousel image -->
     <Image
@@ -93,7 +93,7 @@ const otherImagesData = await Promise.all(
 <script>
   // Initialize all carousels on the page
   function initCarousels() {
-    const carousels = document.querySelectorAll(".product-carousel");
+    const carousels = document.querySelectorAll(".image-carousel");
 
     carousels.forEach((carousel) => {
       let currentIndex = 0;

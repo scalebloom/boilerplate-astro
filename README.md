@@ -4,7 +4,7 @@
 
 The logo exists in two places:
 
-- **`public/logo.svg`** - Static file for structured data/SEO (used by `BusinessSchema.astro`)
+- **`public/logo.png`** - Static file for structured data/SEO (used by `BusinessSchema.astro`)
 - **`src/components/logo.astro`** - Inline SVG component with hover animation (used in Header and Footer)
 
 Both files must be updated when changing the logo. The duplication is intentional: inline SVG is required for CSS animations, while the public file provides a URL for search engines.
@@ -30,11 +30,7 @@ For better SEO, use a specific LocalBusiness subtype: `Restaurant`, `Dentist`, `
 Opt-in per page. Use on 1 page such as home, about, or contact — not on every page. Include it by passing the prop to Layout:
 
 ```astro
-<Layout
-  title="Home"
-  description="Welcome"
-  includeBusinessSchema={true}
->
+<Layout title="Home" description="Welcome" includeBusinessSchema={true} />
 ```
 
 ## Images
@@ -61,9 +57,10 @@ Import and use the `<Image>` component from `astro:assets`:
 
 ```astro
 ---
-import { Image } from 'astro:assets';
-import photo from '../assets/photo.jpg';
+import { Image } from "astro:assets";
+import photo from "../assets/photo.jpg";
 ---
+
 <Image src={photo} alt="Description" width={800} height={600} />
 ```
 

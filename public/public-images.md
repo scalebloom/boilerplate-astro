@@ -1,0 +1,2 @@
+- og-image should be a 1200x630 JPG or PNG, not webp for compatibility.
+- logo should be PNG (Google's structured data guidelines don't support SVG for logo images). Google prefers a solid white background over transparency. Size: Something large like 600x60 or 512x512 for squares. Include some padding.

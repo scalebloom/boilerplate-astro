@@ -30,8 +30,9 @@ export const siteConfig: SiteConfig = {
   // Business Identity
   name: "Your Business Name",
   legalName: "Your Legal Entity LLC",
-  url: "https://www.example.com",
-  description: "Your business description goes here. Describe what you do, who you serve, and what makes you unique.",
+  url: "https://www.example.com", // Ensure to use correct canonical URL (ie with or without www)
+  description:
+    "Your business description goes here. Describe what you do, who you serve, and what makes you unique.",
   slogan: "Your Tagline Here",
 
   // Contact Information
@@ -64,7 +65,7 @@ export const siteConfig: SiteConfig = {
 
   // Branding
   branding: {
-    logo: "/logo.svg",
+    logo: "/logo.png",
     favicon: "/favicon/favicon.svg",
   },
 
@@ -110,7 +111,11 @@ interface LocationConfig {
 }
 
 // Common types, but any schema.org type string is accepted (e.g., "Restaurant", "Dentist")
-type BusinessType = "LocalBusiness" | "Organization" | "OnlineBusiness" | (string & {});
+type BusinessType =
+  | "LocalBusiness"
+  | "Organization"
+  | "OnlineBusiness"
+  | (string & {});
 
 interface OwnerConfig {
   name: string;

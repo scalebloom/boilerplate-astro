@@ -26,7 +26,7 @@ const {
   noindex = false,
 } = Astro.props;
 const canonicalURL = canonical || Astro.url.pathname;
-const fullImageURL = new URL(image || "/og-image.webp", Astro.site).href;
+const fullImageURL = new URL(image || "/og-image.png", Astro.site).href;
 ---
 
 <!doctype html>

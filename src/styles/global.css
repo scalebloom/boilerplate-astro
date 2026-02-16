@@ -206,12 +206,6 @@ Custom Components
 /*Scroll margin (Make anchor links account for sticky header height*/
 .scroll-margin-header,h2,h3{scroll-margin-top:var(--header-height);}
 
-.dark-theme {background-color: var(--clr-contrast);}
-.dark-theme h1,.dark-theme h2,.dark-theme h3,.dark-theme summary {
-  color: var(--clr-base)!important;}
-.dark-theme p {
-  color: var(--clr-base-3)!important;}
-
 /*Link expand technique (expand link to entire parent container (card)*/
 a.link-expand::before {content:'';position:absolute;inset:0;z-index:1;}
 
