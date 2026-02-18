@@ -105,7 +105,6 @@ header,body,button,img,select,input,option,textarea,span,path {
 /*Root variables - Small screens*/   
 @media (max-width: 768px) {
   :root {
-  /*Header height*/
     --header-height: 70px; /* Override for mobile */
   }
 }
@@ -163,25 +162,25 @@ RESET - VERTICAL MARGIN
 /*Reset - Vertical margin - Paragraphs and Links*/
 p:not(.flex *):not(:last-child), /*no :where needed - higher specificity required to override Tailwind's default margin:0 on p*/
 main :where(a:not(:last-child)) { /*:where lowers specificity, allowing overriding, such as with mb-0 (used for header logo link)*/
-  margin-bottom: 1rem;}
+  margin-block-end: 1.5rem;}
 /*Reset - Vertical margin - Lists*/
 main ul:not(:last-child),
 main ol:not(:last-child){
-  margin-bottom:1rem}
-main li:not(:last-child){margin-bottom:.5rem}
+  margin-block-end:1rem}
+main li:not(:last-child){margin-block-end:.5rem}
 /*Reset - Vertical margin - Images & tables*/
 figure:not(:last-child),
 .table-wrapper:not(:last-child){
-  margin-bottom:1rem;}
+  margin-block-end:1rem;}
 /*Reset - Vertical margin - Headings*/
 h1:not(.flex *):not(:last-child),
 h2:not(.flex *):not(:last-child) {
-  margin-bottom: 1.25rem;}
+  margin-block-end: 1.25rem;}
 h3:not(.flex *):not(:last-child) {
-  margin-bottom: .75rem;}
+  margin-block-end: .75rem;}
 h2:not(:first-child),
 h3:not(:first-child){
-  margin-top:0.75em !important}
+  margin-block-start:0.75em !important}
 
 /*****************************
 RESET - OTHER DEFAULT ELEMENTS

@@ -1,0 +1,345 @@
+---
+/**
+ * Card Carousel Component
+ *
+ * A horizontal carousel for displaying cards that extends to viewport edges.
+ * Supports responsive slide counts, touch/swipe navigation, and optional autoplay.
+ * Navigation must be added separately using CardCarouselNav component.
+ *
+ * USAGE:
+ * <CardCarousel id="my-carousel">
+ *   <div>Card 1</div>
+ *   <div>Card 2</div>
+ *   <div>Card 3</div>
+ * </CardCarousel>
+ * <CardCarouselNav for="my-carousel" />
+ *
+ * Props:
+ * - id: Unique identifier (required when using navigation)
+ * - label: Accessible label for the carousel (default: "Carousel")
+ * - slidesMobile: Number of slides visible on mobile (default: 1.1)
+ * - slidesDesktop: Number of slides visible on desktop (default: 1.75)
+ * - gap: Gap between slides in pixels (default: 20)
+ * - breakpoint: Container width breakpoint for mobile/desktop (default: 1150)
+ * - autoplay: Enable autoplay (default: false)
+ * - autoplayDelay: Delay between slides in ms (default: 5000)
+ */
+
+import "./card-carousel.css";
+
+interface Props {
+  id?: string;
+  label?: string;
+  slidesMobile?: number;
+  slidesDesktop?: number;
+  gap?: number;
+  breakpoint?: number;
+  autoplay?: boolean;
+  autoplayDelay?: number;
+}
+
+const {
+  id,
+  label = "Carousel",
+  slidesMobile = 1.1,
+  slidesDesktop = 1.75,
+  gap = 20,
+  breakpoint = 1150,
+  autoplay = false,
+  autoplayDelay = 5000,
+} = Astro.props;
+
+const carouselId = id || `card-carousel-${Math.random().toString(36).substring(7)}`;
+---
+
+<div
+  class="card-carousel-wrapper"
+  id={carouselId}
+  role="region"
+  aria-roledescription="carousel"
+  aria-label={label}
+  tabindex="0"
+  style={`
+    --carousel-slides-mobile: ${slidesMobile};
+    --carousel-slides-desktop: ${slidesDesktop};
+    --carousel-gap: ${gap}px;
+    --carousel-breakpoint: ${breakpoint};
+  `}
+  data-autoplay={autoplay}
+  data-autoplay-delay={autoplayDelay}
+>
+  <div class="card-carousel-slides" aria-live="polite">
+    <slot />
+  </div>
+</div>
+
+<script>
+  interface CardCarouselControls {
+    prev: () => void;
+    next: () => void;
+    goTo: (index: number) => void;
+    getState: () => { currentIndex: number; maxIndex: number };
+    onStateChange: (callback: (state: { currentIndex: number; maxIndex: number }) => void) => void;
+    destroy: () => void;
+  }
+
+  declare global {
+    interface Window {
+      cardCarousels: Map<string, CardCarouselControls>;
+    }
+  }
+
+  // Initialize global registry
+  if (!window.cardCarousels) {
+    window.cardCarousels = new Map();
+  }
+
+  function initCardCarousels() {
+    const carousels = document.querySelectorAll(".card-carousel-wrapper");
+
+    carousels.forEach((el) => {
+      const wrapper = el as HTMLElement;
+      const carouselId = wrapper.id;
+
+      // Clean up existing instance before re-initializing
+      const existing = window.cardCarousels.get(carouselId);
+      if (existing) existing.destroy();
+
+      const container = wrapper.querySelector(".card-carousel-slides") as HTMLElement;
+      const slides = Array.from(container.children) as HTMLElement[];
+
+      if (!container || slides.length === 0) return;
+
+      // Add ARIA attributes to slides
+      slides.forEach((slide, i) => {
+        slide.setAttribute("role", "group");
+        slide.setAttribute("aria-roledescription", "slide");
+        slide.setAttribute("aria-label", `${i + 1} of ${slides.length}`);
+      });
+
+      // State
+      let currentIndex = 0;
+      let isTransitioning = false;
+      let autoplayInterval: number | null = null;
+      const stateChangeCallbacks: ((state: { currentIndex: number; maxIndex: number }) => void)[] = [];
+
+      // Cached layout values (recalculated on resize)
+      let cachedGap = 0;
+      let cachedSlidesToShow = 0;
+      let cachedMaxIndex = 0;
+
+      // Config from data attributes
+      const enableAutoplay = wrapper.getAttribute("data-autoplay") === "true";
+      const autoplayDelay = parseInt(wrapper.getAttribute("data-autoplay-delay") || "5000");
+
+      // Calculate and cache layout values
+      function recalculateLayout() {
+        const styles = getComputedStyle(wrapper);
+        const containerWidth = container.offsetWidth;
+
+        cachedGap = parseInt(getComputedStyle(container).gap) || 20;
+
+        const breakpoint = parseInt(styles.getPropertyValue("--carousel-breakpoint")) || 1150;
+        const slidesMobile = parseFloat(styles.getPropertyValue("--carousel-slides-mobile")) || 1.1;
+        const slidesDesktop = parseFloat(styles.getPropertyValue("--carousel-slides-desktop")) || 1.75;
+
+        cachedSlidesToShow = containerWidth <= breakpoint ? slidesMobile : slidesDesktop;
+
+        const fractionalPart = cachedSlidesToShow % 1;
+        cachedMaxIndex =
+          fractionalPart < 0.5
+            ? Math.max(0, slides.length - 1)
+            : Math.max(0, slides.length - Math.ceil(cachedSlidesToShow));
+
+        // Clamp current index if layout changed
+        if (currentIndex > cachedMaxIndex) {
+          currentIndex = cachedMaxIndex;
+          updateCarousel();
+        }
+      }
+
+      // Notify navigation components of state changes
+      function notifyStateChange() {
+        const state = { currentIndex, maxIndex: cachedMaxIndex };
+        stateChangeCallbacks.forEach((cb) => cb(state));
+      }
+
+      // Update carousel position (single transform on container)
+      function updateCarousel() {
+        const slideWidth = slides[0].offsetWidth;
+        const translateX = -(currentIndex * (slideWidth + cachedGap));
+        container.style.transform = `translateX(${translateX}px)`;
+        notifyStateChange();
+      }
+
+      // Navigate to previous slide
+      function prevSlide() {
+        if (isTransitioning || currentIndex === 0) return;
+
+        isTransitioning = true;
+        currentIndex--;
+        updateCarousel();
+
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 500);
+
+        if (enableAutoplay) resetAutoplay();
+      }
+
+      // Navigate to next slide
+      function nextSlide() {
+        if (isTransitioning || currentIndex >= cachedMaxIndex) return;
+
+        isTransitioning = true;
+        currentIndex++;
+        updateCarousel();
+
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 500);
+
+        if (enableAutoplay) resetAutoplay();
+      }
+
+      // Autoplay functions
+      function startAutoplay() {
+        if (!enableAutoplay) return;
+        stopAutoplay();
+
+        autoplayInterval = window.setInterval(() => {
+          if (currentIndex >= cachedMaxIndex) {
+            currentIndex = 0;
+          } else {
+            currentIndex++;
+          }
+          updateCarousel();
+        }, autoplayDelay);
+      }
+
+      function stopAutoplay() {
+        if (autoplayInterval) {
+          clearInterval(autoplayInterval);
+          autoplayInterval = null;
+        }
+      }
+
+      function resetAutoplay() {
+        stopAutoplay();
+        startAutoplay();
+      }
+
+      // Go to specific slide
+      function goToSlide(index: number) {
+        const targetIndex = Math.max(0, Math.min(index, cachedMaxIndex));
+        if (isTransitioning || targetIndex === currentIndex) return;
+
+        isTransitioning = true;
+        currentIndex = targetIndex;
+        updateCarousel();
+
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 500);
+
+        if (enableAutoplay) resetAutoplay();
+      }
+
+      // Event handlers (stored for cleanup)
+      let resizeTimeout: number;
+      const handleResize = () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = window.setTimeout(() => {
+          recalculateLayout();
+          updateCarousel();
+        }, 100);
+      };
+
+      const handleKeydown = (e: KeyboardEvent) => {
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          prevSlide();
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          nextSlide();
+        }
+      };
+
+      let touchStartX = 0;
+      const handleTouchStart = (e: TouchEvent) => {
+        touchStartX = e.changedTouches[0].screenX;
+      };
+
+      const handleTouchEnd = (e: TouchEvent) => {
+        const touchEndX = e.changedTouches[0].screenX;
+        const diff = touchStartX - touchEndX;
+
+        if (Math.abs(diff) > 50) {
+          if (diff > 0) nextSlide();
+          else prevSlide();
+        }
+      };
+
+      // Attach event listeners
+      window.addEventListener("resize", handleResize);
+      wrapper.addEventListener("keydown", handleKeydown);
+      container.addEventListener("touchstart", handleTouchStart, { passive: true });
+      container.addEventListener("touchend", handleTouchEnd, { passive: true });
+
+      // Pause autoplay on hover/focus
+      if (enableAutoplay) {
+        container.addEventListener("mouseenter", stopAutoplay);
+        container.addEventListener("mouseleave", startAutoplay);
+        wrapper.addEventListener("focusin", stopAutoplay);
+        wrapper.addEventListener("focusout", startAutoplay);
+      }
+
+      // Cleanup function
+      function destroy() {
+        stopAutoplay();
+        clearTimeout(resizeTimeout);
+        window.removeEventListener("resize", handleResize);
+        wrapper.removeEventListener("keydown", handleKeydown);
+        container.removeEventListener("touchstart", handleTouchStart);
+        container.removeEventListener("touchend", handleTouchEnd);
+        if (enableAutoplay) {
+          container.removeEventListener("mouseenter", stopAutoplay);
+          container.removeEventListener("mouseleave", startAutoplay);
+          wrapper.removeEventListener("focusin", stopAutoplay);
+          wrapper.removeEventListener("focusout", startAutoplay);
+        }
+        container.style.transform = "";
+      }
+
+      // Initialize
+      recalculateLayout();
+      notifyStateChange();
+      if (enableAutoplay) startAutoplay();
+
+      // Register carousel controls in global registry
+      if (carouselId) {
+        window.cardCarousels.set(carouselId, {
+          prev: prevSlide,
+          next: nextSlide,
+          goTo: goToSlide,
+          getState: () => ({ currentIndex, maxIndex: cachedMaxIndex }),
+          onStateChange: (callback) => {
+            stateChangeCallbacks.push(callback);
+            callback({ currentIndex, maxIndex: cachedMaxIndex });
+          },
+          destroy,
+        });
+      }
+    });
+  }
+
+  // Initialize on DOMContentLoaded
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initCardCarousels);
+  } else {
+    initCardCarousels();
+  }
+
+  // Re-initialize after view transitions
+  document.addEventListener("astro:after-swap", initCardCarousels);
+</script>

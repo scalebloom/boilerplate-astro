@@ -1,4 +1,5 @@
-footer {
+/*Target footer that is direct child of body, otherwise might target other footers like those in blockquotes*/
+body > footer {
   padding: 4rem 1.25rem 1.5rem 1.25rem;font-size: 1.06rem;
 
   .footer-inner-container {max-width: 80rem; margin: auto;}

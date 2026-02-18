@@ -1,0 +1,93 @@
+---
+/**
+ * Card Carousel Navigation Component
+ *
+ * Navigation controls for CardCarousel components.
+ * Place this anywhere in your layout to control a specific carousel.
+ *
+ * USAGE:
+ * <CardCarousel id="my-carousel">
+ *   <div>Card 1</div>
+ *   <div>Card 2</div>
+ * </CardCarousel>
+ *
+ * <CardCarouselNav for="my-carousel" />
+ *
+ * Props:
+ * - for: ID of the CardCarousel to control (required)
+ * - class: Additional CSS classes
+ */
+
+import "./card-carousel.css";
+
+interface Props {
+  for: string;
+  class?: string;
+}
+
+const { for: carouselId, class: className } = Astro.props;
+---
+
+<div
+  class:list={["card-carousel-nav", className]}
+  data-carousel-nav-for={carouselId}
+>
+  <button class="card-carousel-btn card-carousel-prev" aria-label="Previous slide" disabled>
+    <svg aria-hidden="true">
+      <use href="/sprite.svg#icon-arrow-down" />
+    </svg>
+  </button>
+  <button class="card-carousel-btn card-carousel-next" aria-label="Next slide">
+    <svg aria-hidden="true">
+      <use href="/sprite.svg#icon-arrow-down" />
+    </svg>
+  </button>
+</div>
+
+<script>
+  function initExternalNavs() {
+    const navs = document.querySelectorAll(".card-carousel-nav[data-carousel-nav-for]");
+
+    navs.forEach((nav) => {
+      const carouselId = nav.getAttribute("data-carousel-nav-for");
+      if (!carouselId) return;
+
+      const prevButton = nav.querySelector(".card-carousel-prev") as HTMLButtonElement;
+      const nextButton = nav.querySelector(".card-carousel-next") as HTMLButtonElement;
+
+      if (!prevButton || !nextButton) return;
+
+      // Wait for carousel to be registered
+      function connectToCarousel() {
+        const carousel = window.cardCarousels?.get(carouselId as string);
+        if (!carousel) {
+          // Retry after a short delay if carousel isn't ready yet
+          setTimeout(connectToCarousel, 50);
+          return;
+        }
+
+        // Wire up button clicks
+        prevButton.addEventListener("click", () => carousel.prev());
+        nextButton.addEventListener("click", () => carousel.next());
+
+        // Subscribe to state changes for button states
+        carousel.onStateChange((state) => {
+          prevButton.disabled = state.currentIndex === 0;
+          nextButton.disabled = state.currentIndex >= state.maxIndex;
+        });
+      }
+
+      connectToCarousel();
+    });
+  }
+
+  // Initialize on DOMContentLoaded
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initExternalNavs);
+  } else {
+    initExternalNavs();
+  }
+
+  // Re-initialize after view transitions
+  document.addEventListener("astro:after-swap", initExternalNavs);
+</script>

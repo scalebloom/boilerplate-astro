@@ -85,12 +85,7 @@ import "../styles/forms.css";
 
       try {
         const data = {
-          name: formData.get("name"),
-          email: formData.get("email"),
-          phone: formData.get("phone"),
-          source: formData.get("source"),
-          message: formData.get("message"),
-          website: formData.get("website"),
+          ...Object.fromEntries(formData),
           "time-taken": timeTaken,
           userAgent: navigator.userAgent,
         };

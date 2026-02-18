@@ -5,6 +5,45 @@ import {
   checkSubmissionSpeed,
 } from "./spam-prevention.js";
 
+// =============================================================================
+// FORM CONFIGURATION - Update this when adding/removing fields
+// =============================================================================
+const formFields = [
+  { key: "name", label: "Name", required: true },
+  { key: "company", label: "Company" },
+  { key: "email", label: "Email", required: true },
+  { key: "message", label: "Message" },
+];
+// =============================================================================
+
+function generateEmailText(data) {
+  const lines = formFields.map(({ key, label }) => {
+    const value = data[key];
+    return `${label}: ${value || "Not provided"}`;
+  });
+  lines.push("", `Submitted: ${new Date().toLocaleString()}`);
+  return lines.join("\n");
+}
+
+function generateEmailHtml(data) {
+  const lines = formFields.map(({ key, label }) => {
+    const value = data[key];
+    return `<strong>${label}:</strong> ${value || "Not provided"}`;
+  });
+  return `<p>${lines.join("<br>\n")}</p>
+<p style="color: #6d6d6d; font-style: italic;">Submitted: ${new Date().toLocaleString()}</p>`;
+}
+
+function validateRequiredFields(data) {
+  const requiredFields = formFields.filter((f) => f.required);
+  const missing = requiredFields.filter((f) => !data[f.key]);
+  if (missing.length > 0) {
+    const fieldNames = missing.map((f) => f.label.toLowerCase()).join(" and ");
+    return { valid: false, error: `${fieldNames} required` };
+  }
+  return { valid: true };
+}
+
 export default async (req, context) => {
   if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
@@ -12,7 +51,7 @@ export default async (req, context) => {
 
   try {
     const data = await req.json();
-    const { name, email, phone, source, message, userAgent } = data;
+    const { name, email } = data; // Extracted for logging and email headers
 
     // Spam prevention: Check honeypot field
     if (checkHoneypot(data)) {
@@ -54,7 +93,6 @@ export default async (req, context) => {
       console.log("Blocked submission data:", {
         name,
         email,
-        phone,
         matchedKeywords: spamCheck.matchedKeywords,
         timestamp: new Date().toISOString(),
       });
@@ -79,7 +117,6 @@ export default async (req, context) => {
       console.log("Blocked submission data:", {
         name,
         email,
-        phone,
         suspiciousFields: gibberishCheck.suspiciousFields,
         timestamp: new Date().toISOString(),
       });
@@ -95,11 +132,12 @@ export default async (req, context) => {
     }
 
     // Basic validation
-    if (!name || !email || !phone) {
-      return new Response(
-        JSON.stringify({ error: "Name, email, and phone are required" }),
-        { status: 400, headers: { "Content-Type": "application/json" } },
-      );
+    const validation = validateRequiredFields(data);
+    if (!validation.valid) {
+      return new Response(JSON.stringify({ error: validation.error }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Validate email format
@@ -120,34 +158,24 @@ export default async (req, context) => {
 
     // Prepare email data
     const mailgunData = new URLSearchParams();
-    mailgunData.append("from", "nextgenghs.com <noreply@mg.nextgenghs.com>");
+    mailgunData.append("from", "scalebloom.com <noreply@mg.scalebloom.com>");
     mailgunData.append("h:Reply-To", email);
 
     // If testing email, send to testing address
-    const recipientEmail = email === "test@scalebloom.com"
-      ? "forms+testing@scalebloom.com"
-      : "info@nextgenghs.com";
+    const recipientEmail =
+      email === "test@scalebloom.com"
+        ? "forms+testing@scalebloom.com"
+        : "george@scalebloom.com";
 
     mailgunData.append("to", recipientEmail);
     mailgunData.append("bcc", "forms@scalebloom.com");
     mailgunData.append("subject", `Contact Form Entry from ${name}`);
-    mailgunData.append(
-      "text",
-      `Name: ${name}\nEmail: ${email}\nPhone: ${phone || "Not provided"}\nHow did you find us: ${source || "Not provided"}\nMessage: ${message || "No message"}\n\nSubmitted: ${new Date().toLocaleString()}`,
-    );
-    mailgunData.append(
-      "html",
-      `<p><strong>Name:</strong> ${name}<br>
-<strong>Email:</strong> ${email}<br>
-<strong>Phone:</strong> ${phone || "Not provided"}<br>
-<strong>How did you find us:</strong> ${source || "Not provided"}<br>
-<strong>Message:</strong> ${message || "No message"}</p>
-<p style="color: #6d6d6d; font-style: italic;">Submitted: ${new Date().toLocaleString()}</p>`,
-    );
+    mailgunData.append("text", generateEmailText(data));
+    mailgunData.append("html", generateEmailHtml(data));
 
     // Send via Mailgun
     const response = await fetch(
-      `https://api.mailgun.net/v3/mg.nextgenghs.com/messages`,
+      `https://api.mailgun.net/v3/mg.scalebloom.com/messages`,
       {
         method: "POST",
         headers: {
