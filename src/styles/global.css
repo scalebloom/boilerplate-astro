@@ -114,11 +114,18 @@ RESET - MAIN
 ***********/
 
 *{box-sizing:border-box;margin:0;padding:0}
-html{-moz-text-size-adjust:none;-webkit-text-size-adjust:none;text-size-adjust:none;
-  scrollbar-gutter:stable;}
+html{
+  -moz-text-size-adjust:none;-webkit-text-size-adjust:none;text-size-adjust:none;
+  scrollbar-gutter:stable;
+  scroll-behavior: smooth;}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;animation: none !important;
+  }
+  html {scroll-behavior: auto;}
+}
 body{min-height:100vh;background-color:var(--clr-base);}
 body:has(dialog[open]){overflow:hidden;}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
 /*Global utilities*/
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}
 .no-break{white-space:nowrap;}

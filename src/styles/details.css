@@ -11,7 +11,9 @@ main {
         mask-size: contain;
         background-color: color-mix(in srgb, var(--clr-contrast), transparent 70%);
         width:18px;height:14px;
-        position:absolute;top:1.75rem;right:0;
+        position:absolute;
+        top:clamp(2.25rem, 2.071rem + 0.476vw, 2.5rem);
+        right:0;
         transition:transform 0.3s ease-in-out;
       }
   }
@@ -21,7 +23,11 @@ main {
   /*Details - content - first element after summary*/
   details > summary + *{padding-top:1.5rem!important;}
   /*Details - content*/
-  details *:not(summary) {color: var(--clr-contrast-3);} 
+  details body,textarea,input,button,select,[popover]:not(summary) {
+    color: var(--clr-contrast-3);
+    strong {
+      color: var(--clr-contrast);}
+  } 
 
 
   /*Details - animation*/
